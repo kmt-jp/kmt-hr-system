@@ -77,6 +77,9 @@ create table if not exists public.employees (
 );
 -- 既存のデータベースにも後から足せるようにしておく（給与システムの従業員情報CSVに郵便番号がある）
 alter table public.employees add column if not exists postal_code text default '';
+-- 所属＝雇用契約を結んでいる法人、勤務＝実際に働いている法人（兼務・出向で異なることがある）
+alter table public.employees add column if not exists affiliation text default '';
+alter table public.employees add column if not exists workplace   text default '';
 
 create table if not exists public.employee_docs (
   employee_id uuid not null references public.employees(id) on delete cascade,

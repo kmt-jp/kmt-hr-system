@@ -115,7 +115,9 @@ td.goal-cur{outline:2px solid var(--accent);outline-offset:-2px}
 /* ===== アップデート履歴（この画面のアップデート＋右上トースト） ===== */
 .upd-panel{background:#fff;border:1px solid var(--border);border-left:4px solid var(--accent);
   border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px}
-.upd-head{display:flex;align-items:center;gap:8px;font-weight:800;margin-bottom:8px}
+.upd-head{display:flex;align-items:center;gap:8px;font-weight:800;margin-bottom:8px;cursor:pointer;flex-wrap:wrap}
+.upd-panel.closed .upd-head{margin-bottom:0}
+.upd-head .upd-arrow{font-size:10px;color:var(--accent);width:12px}
 .upd-item{padding:6px 0;border-top:1px dashed var(--border)}
 .upd-item:first-of-type{border-top:none}
 .upd-item.unread{background:var(--accent-soft);border-radius:6px;padding:8px 10px;margin:4px -4px}
@@ -427,6 +429,8 @@ const DEFAULT_DOC_TEMPLATES = [
 const STAGES = ['入社前','入社時','在職中','退職時','退職後'];
 const DOC_STATUSES = ['未依頼','依頼中','受領','確認済','対象外'];
 const EMP_TYPES = ['正社員','契約社員','パートタイム','業務委託','海外リモート'];
+/* 所属＝雇用契約を結んでいる法人、勤務＝実際に働いている法人。兼務・出向で食い違うことがある */
+const COMPANIES = ['株式会社KMT','大房行政書士法人'];
 const EMP_STATUSES = ['内定','在籍','休職','退職'];
 const ZAIRYU_LIST = ['技術・人文知識・国際業務','特定技能1号','特定技能2号','技能実習','永住者','日本人の配偶者等','永住者の配偶者等','定住者','家族滞在','留学','特定活動','経営・管理','その他'];
 const ASSET_CATS = ['PC','モニター','スマートフォン','SIM/回線','ソフトウェアライセンス','クレジットカード','交通・燃料カード','鍵・カード','事務機器','その他'];
@@ -661,6 +665,7 @@ function dbToEmp(r){ return {
   id:r.id, empNo:r.emp_no, status:r.status, nameKanji:r.name_kanji, nameKana:r.name_kana, nameRoma:r.name_roma,
   birthDate:r.birth_date||'', gender:r.gender, nationality:r.nationality, isForeign:r.is_foreign,
   employmentType:r.employment_type, department:r.department, position:r.position,
+  affiliation:r.affiliation||'', workplace:r.workplace||'',
   hireDate:r.hire_date||'', probationEnd:r.probation_end||'', contractEnd:r.contract_end||'', resignDate:r.resign_date||'',
   email:r.email, phone:r.phone, postalCode:r.postal_code||'', address:r.address,
   emergencyName:r.emergency_name, emergencyRelation:r.emergency_relation, emergencyPhone:r.emergency_phone,
@@ -672,6 +677,7 @@ function empToDb(e){ return {
   id:e.id, emp_no:e.empNo||'', status:e.status, name_kanji:e.nameKanji||'', name_kana:e.nameKana||'', name_roma:e.nameRoma||'',
   birth_date:dOrNull(e.birthDate), gender:e.gender||'', nationality:e.nationality||'', is_foreign:!!e.isForeign,
   employment_type:e.employmentType, department:e.department||'', position:e.position||'',
+  affiliation:e.affiliation||'', workplace:e.workplace||'',
   hire_date:dOrNull(e.hireDate), probation_end:dOrNull(e.probationEnd), contract_end:dOrNull(e.contractEnd), resign_date:dOrNull(e.resignDate),
   email:e.email||'', phone:e.phone||'', postal_code:e.postalCode||'', address:e.address||'',
   emergency_name:e.emergencyName||'', emergency_relation:e.emergencyRelation||'', emergency_phone:e.emergencyPhone||'',
@@ -1135,6 +1141,7 @@ const NAV = [
   ['dashboard','ダッシュボード',0],
   ['talent','タレント',1],
   ['employees','従業員・人事情報',1],
+  ['past','過去',1],
   ['docs','労務・書類管理',1],
   ['licenses','許可証管理',1],
   ['selfing','SELFing',1],
@@ -1189,6 +1196,8 @@ function applyUpdate(){ location.reload(); }
    ページを開き直しても必ず気づける。 */
 let updToastClosed = false;
 let updShowAll = false;
+/* アップデート欄は普段は閉じておき、見出しをクリックしたときだけ中身を出す（画面を占領しないため） */
+let updPanelOpen = false;
 function updUnread(){
   const em = myEmail();
   return (data.appUpdates||[]).filter(u =>
@@ -1207,20 +1216,22 @@ function updPanelHtml(){
   const shown = updShowAll ? all : all.slice(0, unread.length ? unread.length : 1);
   const rest = all.length - shown.length;
   return `
-  <div class="upd-panel">
-    <div class="upd-head">
+  <div class="upd-panel ${updPanelOpen?'':'closed'}">
+    <div class="upd-head" onclick="updPanelOpen=!updPanelOpen;render()" title="${updPanelOpen?'閉じる':'クリックで開く'}">
+      <span class="upd-arrow">${updPanelOpen?'▼':'▶'}</span>
       📖 このシステムのアップデート
       ${unread.length? `<span class="badge b-red">新着 ${unread.length}件</span>`:''}
+      ${!updPanelOpen? `<span class="muted" style="font-weight:400;font-size:12px">${esc(all[0].version)}　${esc(all[0].title)}</span>`:''}
       <div class="spacer"></div>
-      ${unread.length? `<button class="btn small" onclick="markUpdRead()">確認しました</button>`:''}
+      ${unread.length? `<button class="btn small" onclick="event.stopPropagation();markUpdRead()">確認しました</button>`:''}
     </div>
-    ${shown.map(u=>`
+    ${!updPanelOpen? '' : shown.map(u=>`
       <div class="upd-item ${updUnread().some(x=>x.id===u.id)?'unread':''}">
         <div class="upd-ver">${esc(u.version)}　<span class="muted">${esc(u.released_on)}</span>
           ${esc(u.title)}</div>
         ${updItemsHtml(u)}
       </div>`).join('')}
-    ${rest>0 || updShowAll? `<a class="upd-more" href="javascript:updShowAll=${!updShowAll};render()">
+    ${updPanelOpen && (rest>0 || updShowAll)? `<a class="upd-more" href="javascript:updShowAll=${!updShowAll};render()">
       ${updShowAll? '▲ 折りたたむ' : `▼ これまでのアップデート（${rest}件）を見る`}</a>`:''}
   </div>`;
 }
@@ -1234,7 +1245,7 @@ function updToastHtml(){
     <button class="x" onclick="updToastClosed=true;render()" title="閉じる">✕</button>
     <div class="t">📢 アップデートのお知らせ</div>
     <div class="b">${esc(u.title)}${unread.length>1? `　他${unread.length-1}件`:''}</div>
-    <button class="btn" onclick="updToastClosed=true;go('dashboard');window.scrollTo(0,0)">詳細を見る</button>
+    <button class="btn" onclick="updToastClosed=true;updPanelOpen=true;go('dashboard');window.scrollTo(0,0)">詳細を見る</button>
   </div>`;
 }
 async function markUpdRead(){
@@ -1345,10 +1356,10 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20260904.43';
+const APP_VER = 'ver.20260917.44';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
-  {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
+  {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
   {key:'romu',   label:'労務・書類', tone:'lilac', items:[['docs','📄','労務・書類管理'],['licenses','🏛','許可証管理'],['welfare','🎁','福利厚生'],['guide','📘','手続きガイド']]},
   {key:'keiei',  label:'経営管理',   tone:'mint',  items:[['geppo','🗓','GLT月報'],['kpi','📈','KPI管理'],['assets','💼','資産管理']]},
   {key:'system', label:'設定',       tone:'sky',   items:[['users','👤','ユーザー管理'],['data','⚙️','データ管理']]},
@@ -1454,6 +1465,7 @@ function render(){
   else if(view==='selfing') m.innerHTML = viewSelfing();
   else if(view==='mental') m.innerHTML = viewMental();
   else if(view==='employees') m.innerHTML = currentEmpId? viewEmpDetail(currentEmpId) : viewEmployees();
+  else if(view==='past')      m.innerHTML = viewPastEmployees();
   else if(view==='docs') m.innerHTML = viewDocs();
   else if(view==='evals') m.innerHTML = viewEvals();
   else if(view==='kpi') m.innerHTML = viewKpi();
@@ -4671,6 +4683,7 @@ function viewDashboard(){
 function viewEmployees(){
   const f = empFilter;
   let list = scopeEmps(data.employees).filter(e=>{
+    if(e.status==='退職') return false;          /* 退職者は「過去」メニューに分けている */
     if(f.status && e.status!==f.status) return false;
     if(f.type && e.employmentType!==f.type) return false;
     if(f.dept && e.department!==f.dept) return false;
@@ -4689,7 +4702,7 @@ function viewEmployees(){
       <input placeholder="検索：氏名・社員番号・国籍…" value="${esc(f.q)}" oninput="empFilter.q=this.value;render()" style="width:220px">
       <select onchange="empFilter.status=this.value;render()">
         <option value="">全ステータス</option>
-        ${EMP_STATUSES.map(s=>`<option ${f.status===s?'selected':''}>${s}</option>`).join('')}
+        ${EMP_STATUSES.filter(s=>s!=='退職').map(s=>`<option ${f.status===s?'selected':''}>${s}</option>`).join('')}
       </select>
       <select onchange="empFilter.type=this.value;render()">
         <option value="">全雇用区分</option>
@@ -4704,7 +4717,7 @@ function viewEmployees(){
       <button class="btn" onclick="openEmpForm()">＋ 従業員登録</button>` : '<span class="muted">閲覧のみの権限です</span>'}
     </div>
     <div class="tablewrap"><table>
-      <tr><th>社員番号</th><th>氏名</th><th>ローマ字</th><th>国籍</th><th>雇用区分</th><th>部署</th><th>入社日</th><th>在留資格</th><th>在留期限</th><th>書類</th><th>状態</th></tr>
+      <tr><th>社員番号</th><th>氏名</th><th>ローマ字</th><th>国籍</th><th>雇用区分</th><th>所属 / 勤務</th><th>部署</th><th>入社日</th><th>在留資格</th><th>在留期限</th><th>書類</th><th>状態</th></tr>
       ${list.map(e=>{
         const p=docProgress(e);
         const zd = e.isForeign&&e.zairyuExpiry? daysUntil(e.zairyuExpiry):null;
@@ -4714,6 +4727,7 @@ function viewEmployees(){
           <td>${esc(e.nameRoma||'')}</td>
           <td>${esc(e.nationality||'')}</td>
           <td><span class="badge ${e.employmentType==='正社員'?'b-blue':e.employmentType==='海外リモート'?'b-yellow':'b-gray'}">${esc(e.employmentType)}</span></td>
+          <td class="small">${esc(e.affiliation||'—')}${e.workplace&&e.workplace!==e.affiliation?`<br><span class="muted">勤務：${esc(e.workplace)}</span>`:''}</td>
           <td>${esc(e.department||'')}</td>
           <td>${fmtDate(e.hireDate)}</td>
           <td>${e.isForeign?esc(e.zairyuStatus||'未設定'):'—'}</td>
@@ -4721,11 +4735,47 @@ function viewEmployees(){
           <td>${p.done}/${p.total}</td>
           <td><span class="badge ${e.status==='在籍'?'b-green':e.status==='内定'?'b-blue':e.status==='退職'?'b-gray':'b-yellow'}">${e.status}</span></td>
         </tr>`;
-      }).join('')||'<tr><td colspan="11" class="muted">該当する従業員がいません。右上の「＋従業員登録」から追加するか、「データ管理」からサンプルデータを投入できます。</td></tr>'}
+      }).join('')||'<tr><td colspan="12" class="muted">該当する従業員がいません。右上の「＋従業員登録」から追加するか、「データ管理」からサンプルデータを投入できます。</td></tr>'}
     </table></div>
   </div>`;
 }
-function openEmp(id){ view='employees'; currentEmpId=id; render(); window.scrollTo(0,0); }
+let empBackView = '';   /* 詳細を開く前にいた一覧（過去メニューから来たら過去へ戻す） */
+function openEmp(id, from){ empBackView = from||''; view='employees'; currentEmpId=id; render(); window.scrollTo(0,0); }
+function backFromEmp(){ currentEmpId=null; if(empBackView){ view=empBackView; empBackView=''; } render(); }
+
+/* 過去：退職した従業員。人事書類の保存義務があるため、削除せずにここで保持する。 */
+function viewPastEmployees(){
+  const list = scopeEmps(data.employees).filter(e=>e.status==='退職' && !isFamilyRec(e))
+    .sort((a,b)=>(b.resignDate||'').localeCompare(a.resignDate||''));
+  const tenure = e=>{
+    if(!e.hireDate || !e.resignDate) return '—';
+    const m = (new Date(e.resignDate) - new Date(e.hireDate)) / (1000*60*60*24*30.4375);
+    if(m < 0) return '—';
+    const y = Math.floor(m/12), mm = Math.round(m - y*12);
+    return (y? y+'年':'') + (mm? mm+'か月' : (y? '':'1か月未満'));
+  };
+  return `
+  <div class="panel">
+    <h2>🗃 過去 <span class="en">退職した従業員（${list.length}名）</span></h2>
+    <p class="muted" style="margin-bottom:10px">退職者のデータは削除せずにここに残しています（労働者名簿などは退職後5年の保存義務があります）。
+      名前をクリックすると詳細を開けます。在籍に戻すときは、詳細の「編集」でステータスを変更してください。</p>
+    <div class="tablewrap"><table>
+      <tr><th>社員番号</th><th>氏名</th><th>国籍</th><th>雇用区分</th><th>所属 / 勤務</th><th>部署</th>
+          <th>入社日</th><th>退職日</th><th>在籍期間</th></tr>
+      ${list.map(e=>`<tr class="clickable" onclick="openEmp('${e.id}','past')">
+        <td>${esc(e.empNo||'—')}</td>
+        <td><b>${esc(e.nameKanji||e.nameRoma)}</b><br><span class="muted">${esc(e.nameKana||'')}</span></td>
+        <td>${esc(e.nationality||'')}</td>
+        <td>${esc(e.employmentType||'')}</td>
+        <td class="small">${esc(e.affiliation||'—')}${e.workplace&&e.workplace!==e.affiliation?`<br><span class="muted">勤務：${esc(e.workplace)}</span>`:''}</td>
+        <td>${esc(e.department||'')}</td>
+        <td>${fmtDate(e.hireDate)}</td>
+        <td>${e.resignDate? fmtDate(e.resignDate) : '<span class="badge b-yellow">未入力</span>'}</td>
+        <td>${tenure(e)}</td>
+      </tr>`).join('') || '<tr><td colspan="9" class="muted">退職した従業員はいません。</td></tr>'}
+    </table></div>
+  </div>`;
+}
 
 function viewEmpDetail(id){
   const e = empById(id);
@@ -4745,11 +4795,13 @@ function viewEmpDetail(id){
           <span class="badge ${e.status==='在籍'?'b-green':e.status==='内定'?'b-blue':'b-gray'}">${e.status}</span>
           <span class="badge b-blue">${esc(e.employmentType)}</span>
           ${e.isForeign?`<span class="badge b-yellow">外国籍：${esc(e.nationality||'')}</span>`:''}
+          ${e.affiliation?`<span class="badge b-purple">所属：${esc(e.affiliation)}</span>`:''}
+          ${e.workplace?`<span class="badge b-purple">勤務：${esc(e.workplace)}</span>`:''}
           ${e.socialIns?'<span class="badge b-gray">社保加入</span>':''}
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <button class="btn secondary" onclick="currentEmpId=null;render()">← 一覧へ</button>
+        <button class="btn secondary" onclick="backFromEmp()">← 一覧へ</button>
         <select id="docSelect" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px">
           ${Object.entries(PRINT_DOCS).map(([k,d])=>`<option value="${k}">${d.title}</option>`).join('')}
         </select>
@@ -4767,6 +4819,7 @@ function viewEmpDetail(id){
           <dt>性別</dt><dd>${esc(e.gender||'—')}</dd>
           <dt>国籍</dt><dd>${esc(e.nationality||'—')}</dd>
           <dt>部署 / 役職</dt><dd>${esc(e.department||'—')} / ${esc(e.position||'—')}</dd>
+          <dt>所属 / 勤務</dt><dd>${esc(e.affiliation||'—')} / ${esc(e.workplace||'—')}</dd>
           <dt>入社日</dt><dd>${fmtDate(e.hireDate)}</dd>
           <dt>試用期間終了</dt><dd>${fmtDate(e.probationEnd)}</dd>
           <dt>契約終了日</dt><dd>${fmtDate(e.contractEnd)}</dd>
@@ -4884,6 +4937,7 @@ function openEmpForm(id){
   const e = id? empById(id) : {
     id:uid(), empNo:'', status:'内定', nameKanji:'', nameKana:'', nameRoma:'', birthDate:'', gender:'',
     nationality:'日本', isForeign:false, employmentType:'正社員', department:data.departments[0]||'', position:'',
+    affiliation:'', workplace:'',
     hireDate:'', probationEnd:'', contractEnd:'', resignDate:'',
     email:'', phone:'', postalCode:'', address:'', emergencyName:'', emergencyRelation:'', emergencyPhone:'',
     socialIns:true, empInsNo:'', pensionNo:'', myNumberCollected:false,
@@ -4906,6 +4960,8 @@ function openEmpForm(id){
     <div><label>外国籍（在留管理対象）</label><select id="f_isForeign"><option value="0" ${!e.isForeign?'selected':''}>いいえ</option><option value="1" ${e.isForeign?'selected':''}>はい</option></select></div>
     <div><label>部署</label><select id="f_dept">${data.departments.map(s=>`<option ${e.department===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
     <div><label>役職</label><input id="f_pos" value="${esc(e.position)}"></div>
+    <div><label>所属（雇用契約の法人）</label><select id="f_aff"><option value="">—</option>${COMPANIES.map(s=>`<option ${e.affiliation===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div><label>勤務（実際に働く法人）</label><select id="f_work"><option value="">—</option>${COMPANIES.map(s=>`<option ${e.workplace===s?'selected':''}>${s}</option>`).join('')}</select></div>
     <div><label>入社日</label><input type="date" id="f_hire" value="${esc(e.hireDate)}"></div>
     <div><label>試用期間終了日</label><input type="date" id="f_prob" value="${esc(e.probationEnd)}"></div>
     <div><label>契約終了日（有期の場合）</label><input type="date" id="f_cend" value="${esc(e.contractEnd)}"></div>
@@ -4952,6 +5008,7 @@ async function saveEmp(id, isNew){
     nameKanji:g('f_nameKanji'), nameKana:g('f_nameKana'), nameRoma:g('f_nameRoma'),
     birthDate:g('f_birth'), gender:g('f_gender'), nationality:g('f_nat'),
     isForeign:g('f_isForeign')==='1', department:document.getElementById('f_dept').value, position:g('f_pos'),
+    affiliation:g('f_aff'), workplace:g('f_work'),
     hireDate:g('f_hire'), probationEnd:g('f_prob'), contractEnd:g('f_cend'), resignDate:g('f_resign'),
     email:g('f_email'), phone:g('f_phone'), postalCode:g('f_zip'), address:g('f_addr'),
     emergencyName:g('f_emName'), emergencyRelation:g('f_emRel'), emergencyPhone:g('f_emPhone'),
@@ -5840,10 +5897,10 @@ async function importJson(){
 }
 function csvCell(v){ v = String(v==null?'':v); return '"'+v.replace(/"/g,'""')+'"'; }
 function exportEmpCsv(){
-  const head = ['社員番号','ステータス','氏名','フリガナ','ローマ字','生年月日','性別','国籍','外国籍','雇用区分','部署','役職','入社日','試用期間終了','契約終了日','退職日','メール','電話','郵便番号','住所','緊急連絡先','緊急電話','社会保険','雇用保険番号','基礎年金番号','マイナンバー提出','在留資格','在留カード番号','在留期限','パスポート番号','パスポート期限','書類完了率','メモ'];
+  const head = ['社員番号','ステータス','氏名','フリガナ','ローマ字','生年月日','性別','国籍','外国籍','雇用区分','部署','役職','所属','勤務','入社日','試用期間終了','契約終了日','退職日','メール','電話','郵便番号','住所','緊急連絡先','緊急電話','社会保険','雇用保険番号','基礎年金番号','マイナンバー提出','在留資格','在留カード番号','在留期限','パスポート番号','パスポート期限','書類完了率','メモ'];
   const rows = data.employees.map(e=>{
     const p = docProgress(e);
-    return [e.empNo,e.status,e.nameKanji,e.nameKana,e.nameRoma,e.birthDate,e.gender,e.nationality,e.isForeign?'はい':'いいえ',e.employmentType,e.department,e.position,e.hireDate,e.probationEnd,e.contractEnd,e.resignDate,e.email,e.phone,e.postalCode,e.address,e.emergencyName,e.emergencyPhone,e.socialIns?'加入':'未加入',e.empInsNo,e.pensionNo,e.myNumberCollected?'済':'未',e.zairyuStatus,e.zairyuCardNo,e.zairyuExpiry,e.passportNo,e.passportExpiry,p.pct+'%',e.notes].map(csvCell).join(',');
+    return [e.empNo,e.status,e.nameKanji,e.nameKana,e.nameRoma,e.birthDate,e.gender,e.nationality,e.isForeign?'はい':'いいえ',e.employmentType,e.department,e.position,e.affiliation,e.workplace,e.hireDate,e.probationEnd,e.contractEnd,e.resignDate,e.email,e.phone,e.postalCode,e.address,e.emergencyName,e.emergencyPhone,e.socialIns?'加入':'未加入',e.empInsNo,e.pensionNo,e.myNumberCollected?'済':'未',e.zairyuStatus,e.zairyuCardNo,e.zairyuExpiry,e.passportNo,e.passportExpiry,p.pct+'%',e.notes].map(csvCell).join(',');
   });
   download(`従業員一覧-${today()}.csv`, '﻿'+head.map(csvCell).join(',')+'\n'+rows.join('\n'), 'text/csv');
 }
