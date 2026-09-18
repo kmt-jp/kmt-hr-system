@@ -294,6 +294,9 @@ button.btn.ghost{background:#fff;color:var(--sub);border:1px solid var(--border)
 /* 福利厚生アンケートの自由記述 */
 .wf-quote{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;
   padding:8px 12px;margin-bottom:8px;font-size:13px;line-height:1.7;white-space:pre-wrap}
+.addr-hist{margin-top:6px}
+.addr-hist table{margin-top:4px;font-size:12px}
+.addr-hist td{padding:4px 6px}
 .wf-who{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px}
 table.jd td{font-size:13px;vertical-align:middle}
 table.jd td:last-child{width:110px;white-space:nowrap;vertical-align:top;padding-top:8px}
@@ -491,6 +494,7 @@ const WRITE_RANK = {allowed_users:3, departments:2, doc_templates:2, employees:2
   role_master:2,
   selfing_reports:1, selfing_roles:1,                  // SELFingは本人が自分の申告を書ける（RLSで自分の分に制限）
   role_skill_targets:2,
+  employee_address_history:2,
   jd_items:2, jd_checks:1, jd_assignments:1, jd_metrics:1,  // 職務チェック・担当職種・実績は本人が付ける（RLSで自分の分に制限）
   mandala_charts:1,
   mental_checks:1, mental_followups:1};   // こころの健康は本人が書く（RLSで本人＋メンタル担当に限定）                                 // 個人マンダラは本人が編集できる（RLSで制限）
@@ -563,7 +567,7 @@ const KPI_LIBRARY = [
 let data = {departments:[], employees:[], evaluations:[], kpis:[], assets:[], docTemplates:[], allowedUsers:[], skillDefs:[], empSkills:{}, announcements:[], annReads:[], licenses:[], monthlyReports:[], teamTargets:[], caseRecords:[], appUpdates:[], updReads:[],
 roleMaster:[], selfingReports:[], selfingRoles:[], roleSkillTargets:[], mandalaCharts:[],
 jdItems:[], jdChecks:[], jdAssignments:[], jdMetrics:[],
-wfQuestions:[], wfResponses:[], wfTopics:[], wfTasks:[], wfIdeas:[]};
+wfQuestions:[], wfResponses:[], wfTopics:[], wfTasks:[], wfIdeas:[], addrHistory:[]};
 let session = null;
 let view = 'dashboard';
 let empFilter = {q:'', status:'在籍', type:'', dept:''};
@@ -667,7 +671,7 @@ function dbToEmp(r){ return {
   employmentType:r.employment_type, department:r.department, position:r.position,
   affiliation:r.affiliation||'', workplace:r.workplace||'',
   hireDate:r.hire_date||'', probationEnd:r.probation_end||'', contractEnd:r.contract_end||'', resignDate:r.resign_date||'',
-  email:r.email, phone:r.phone, postalCode:r.postal_code||'', address:r.address,
+  email:r.email, phone:r.phone, postalCode:r.postal_code||'', address:r.address, addressSince:r.address_since||'',
   emergencyName:r.emergency_name, emergencyRelation:r.emergency_relation, emergencyPhone:r.emergency_phone,
   socialIns:r.social_ins, empInsNo:r.emp_ins_no, pensionNo:r.pension_no, myNumberCollected:r.my_number_collected,
   zairyuStatus:r.zairyu_status, zairyuCardNo:r.zairyu_card_no, zairyuExpiry:r.zairyu_expiry||'',
@@ -679,7 +683,7 @@ function empToDb(e){ return {
   employment_type:e.employmentType, department:e.department||'', position:e.position||'',
   affiliation:e.affiliation||'', workplace:e.workplace||'',
   hire_date:dOrNull(e.hireDate), probation_end:dOrNull(e.probationEnd), contract_end:dOrNull(e.contractEnd), resign_date:dOrNull(e.resignDate),
-  email:e.email||'', phone:e.phone||'', postal_code:e.postalCode||'', address:e.address||'',
+  email:e.email||'', phone:e.phone||'', postal_code:e.postalCode||'', address:e.address||'', address_since:dOrNull(e.addressSince),
   emergency_name:e.emergencyName||'', emergency_relation:e.emergencyRelation||'', emergency_phone:e.emergencyPhone||'',
   social_ins:!!e.socialIns, emp_ins_no:e.empInsNo||'', pension_no:e.pensionNo||'', my_number_collected:!!e.myNumberCollected,
   zairyu_status:e.zairyuStatus||'', zairyu_card_no:e.zairyuCardNo||'', zairyu_expiry:dOrNull(e.zairyuExpiry),
@@ -701,7 +705,7 @@ function assetToDb(a){ return {id:a.id, asset_no:a.assetNo||'', category:a.categ
 async function loadAll(){
   const [deps, tpls, emps, docs, evals, kpis, assets, allowed, skdefs, esk, anns, reads, lics,
          mrep, ttg, crec, upds, urds, rmst, srep, srol, rst, mnd, jdi, jdc, jda, jdm,
-         wfq, wfr, wft, wfk, wfi] = await Promise.all([
+         wfq, wfr, wft, wfk, wfi, adh] = await Promise.all([
     q(sb.from('departments').select('*').order('sort_order')),
     q(sb.from('doc_templates').select('*').order('sort_order')),
     q(sb.from('employees').select('*')),
@@ -735,7 +739,10 @@ async function loadAll(){
     q(sb.from('welfare_topics').select('*').order('sort_order')),
     q(sb.from('welfare_tasks').select('*').order('sort_order')),
     q(sb.from('welfare_ideas').select('*').order('sort_order')),
+    q(sb.from('employee_address_history').select('*').order('valid_to', {ascending:false})),
   ]);
+  data.addrHistory = (adh||[]).map(r=>({id:r.id, empId:r.employee_id, postalCode:r.postal_code||'', address:r.address||'',
+    validFrom:r.valid_from||'', validTo:r.valid_to||'', recordedBy:r.recorded_by||''}));
   data.wfQuestions = wfq||[];
   data.wfResponses = wfr||[];
   data.wfTopics    = wft||[];
@@ -1356,7 +1363,7 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20260917.44';
+const APP_VER = 'ver.20260919.45';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
   {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
@@ -4777,6 +4784,32 @@ function viewPastEmployees(){
   </div>`;
 }
 
+/* 住所変更履歴（新しい順）。期間は「住み始めた日〜引っ越した日」 */
+let addrHistOpen = false;
+function addrHistoryHtml(e){
+  const hs = (data.addrHistory||[]).filter(h=>h.empId===e.id)
+    .sort((a,b)=>(b.validTo||'').localeCompare(a.validTo||''));
+  if(!hs.length) return '';
+  return `
+  <div class="addr-hist">
+    <a href="javascript:addrHistOpen=!addrHistOpen;render()" class="small">${addrHistOpen?'▼':'▶'} 住所変更履歴（過去の住所 ${hs.length}件）</a>
+    ${addrHistOpen? `<table>
+      ${hs.map(h=>`<tr>
+        <td class="nowrap small">${h.validFrom? fmtDate(h.validFrom) : '（不明）'}<br>〜 ${fmtDate(h.validTo)}</td>
+        <td class="small">${h.postalCode? `〒${esc(h.postalCode)} `:''}${esc(h.address)}</td>
+        <td>${canEdit()? `<button class="btn small ghost" title="誤って残った履歴を削除" onclick="delAddrHistory('${h.id}')">✕</button>`:''}</td>
+      </tr>`).join('')}
+    </table>`:''}
+  </div>`;
+}
+/* 在留カードを持つ人は、転居から14日以内に新住所の市区町村へ届出が必要（入管法19条の9／転入届で兼ねる） */
+function addrMoveNotice(e){
+  if(!e.isForeign || !e.addressSince || !(data.addrHistory||[]).some(h=>h.empId===e.id)) return '';
+  const days = daysUntil(e.addressSince);          // 過去日なら負の値
+  if(days === null || days < -14) return '';
+  const due = new Date(e.addressSince); due.setDate(due.getDate()+14);
+  return `<div class="badge b-yellow" style="white-space:normal;margin-top:4px">転居の届出（住居地の届出）は ${fmtDate(iso(due))} までに市区町村で</div>`;
+}
 function viewEmpDetail(id){
   const e = empById(id);
   if(!e) { currentEmpId=null; return viewEmployees(); }
@@ -4832,7 +4865,10 @@ function viewEmpDetail(id){
         <dl class="kv">
           <dt>メール</dt><dd>${esc(e.email||'—')}</dd>
           <dt>電話</dt><dd>${esc(e.phone||'—')}</dd>
-          <dt>住所 / 居住国</dt><dd>${e.postalCode? `〒${esc(e.postalCode)}<br>`:''}${esc(e.address||'—')}</dd>
+          <dt>住所 / 居住国</dt><dd>${e.postalCode? `〒${esc(e.postalCode)}<br>`:''}${esc(e.address||'—')}
+            ${e.addressSince? `<div class="muted small">${fmtDate(e.addressSince)} から</div>`:''}
+            ${addrMoveNotice(e)}
+            ${addrHistoryHtml(e)}</dd>
           <dt>緊急連絡先</dt><dd>${esc(e.emergencyName||'—')} ${esc(e.emergencyRelation?`(${e.emergencyRelation})`:'')}<br>${esc(e.emergencyPhone||'')}</dd>
         </dl>
         <div class="section-title">社会保険・税</div>
@@ -4939,7 +4975,7 @@ function openEmpForm(id){
     nationality:'日本', isForeign:false, employmentType:'正社員', department:data.departments[0]||'', position:'',
     affiliation:'', workplace:'',
     hireDate:'', probationEnd:'', contractEnd:'', resignDate:'',
-    email:'', phone:'', postalCode:'', address:'', emergencyName:'', emergencyRelation:'', emergencyPhone:'',
+    email:'', phone:'', postalCode:'', address:'', addressSince:'', emergencyName:'', emergencyRelation:'', emergencyPhone:'',
     socialIns:true, empInsNo:'', pensionNo:'', myNumberCollected:false,
     zairyuStatus:'', zairyuCardNo:'', zairyuExpiry:'', passportNo:'', passportExpiry:'', toritsugiExpiry:'',
     notes:'', docs:{}
@@ -4972,6 +5008,12 @@ function openEmpForm(id){
     <div><label>電話</label><input id="f_phone" value="${esc(e.phone)}"></div>
     <div><label>郵便番号</label><input id="f_zip" value="${esc(e.postalCode)}" placeholder="144-0051"></div>
     <div style="grid-column:1/-1"><label>住所（海外リモートは居住国・都市）</label><input id="f_addr" value="${esc(e.address)}"></div>
+    <div><label>住所の変更日（転居日）</label><input type="date" id="f_addrSince" value="${esc(e.addressSince)}"></div>
+    <div style="grid-column:span 2;align-self:end">
+      <label style="display:flex;gap:6px;align-items:center;font-weight:400">
+        <input type="checkbox" id="f_addrFix" style="width:auto"> 表記の修正だけ（引っ越しではない・履歴に残さない）</label>
+      <div class="muted" style="margin-top:2px">引っ越しで住所を変えたときは、変更日を入れて保存してください。変更前の住所は「住所変更履歴」に残ります。</div>
+    </div>
     <div><label>緊急連絡先 氏名</label><input id="f_emName" value="${esc(e.emergencyName)}"></div>
     <div><label>続柄</label><input id="f_emRel" value="${esc(e.emergencyRelation)}"></div>
     <div><label>緊急連絡先 電話</label><input id="f_emPhone" value="${esc(e.emergencyPhone)}"></div>
@@ -5003,7 +5045,20 @@ function openEmpForm(id){
 async function saveEmp(id, isNew){
   const g = i=>document.getElementById(i).value.trim();
   let e = isNew? {id, docs:{}} : empById(id);
+  /* 住所変更の判定は、全角／半角・ハイフンの種類・空白の違いを無視して行う
+     （既存データに「蒲田４－４２」と「蒲田4-42」が混在しているため、表記ゆれを引っ越し扱いしない） */
+  const oldZip = isNew? '' : (e.postalCode||''), oldAddr = isNew? '' : (e.address||''), oldSince = isNew? '' : (e.addressSince||'');
+  const newAddr = g('f_addr'), newSince = g('f_addrSince'), fixOnly = document.getElementById('f_addrFix').checked;
+  const moved = !isNew && !fixOnly && oldAddr && addrKey(oldAddr) !== addrKey(newAddr);
+  if(moved){
+    if(!newSince || newSince === oldSince){
+      alert('住所が変わっています。\n「住所の変更日（転居日）」に引っ越した日を入れてください。\n（表記を直しただけのときは「表記の修正だけ」にチェック）');
+      document.getElementById('f_addrSince').focus(); return;
+    }
+    if(oldSince && newSince < oldSince){ alert('住所の変更日が、前の住所に住み始めた日（'+oldSince+'）より前になっています。'); return; }
+  }
   Object.assign(e,{
+    addressSince: newSince,
     empNo:g('f_empNo'), status:g('f_status'), employmentType:g('f_type'),
     nameKanji:g('f_nameKanji'), nameKana:g('f_nameKana'), nameRoma:g('f_nameRoma'),
     birthDate:g('f_birth'), gender:g('f_gender'), nationality:g('f_nat'),
@@ -5020,8 +5075,25 @@ async function saveEmp(id, isNew){
   if(!e.nameKanji && !e.nameRoma){ alert('氏名（漢字またはローマ字）を入力してください'); return; }
   await q(sb.from('employees').upsert(empToDb(e)));
   if(isNew) data.employees.push(e);
-  toast('保存しました');
+  if(moved){
+    const row = {employee_id:e.id, postal_code:oldZip, address:oldAddr,
+      valid_from:dOrNull(oldSince), valid_to:newSince, recorded_by:myEmail()};
+    const ins = await q(sb.from('employee_address_history').insert(row).select());
+    if(ins && ins[0]) data.addrHistory.unshift({id:ins[0].id, empId:e.id, postalCode:oldZip, address:oldAddr,
+      validFrom:oldSince, validTo:newSince, recordedBy:myEmail()});
+  }
+  toast(moved? '保存しました（変更前の住所を履歴に残しました）' : '保存しました');
   closeModal(); currentEmpId = e.id; view='employees'; render();
+}
+function addrKey(a){
+  return (a||'').normalize('NFKC').replace(/[\s　]/g,'').replace(/[‐‑‒–—―ー－−]/g,'-').toLowerCase();
+}
+async function delAddrHistory(hid){
+  if(!canEdit()){ toast(denyMsg(), true); return; }
+  if(!confirm('この住所の履歴を削除しますか？（誤って残った履歴を消すときに使います）')) return;
+  await q(sb.from('employee_address_history').delete().eq('id', hid));
+  data.addrHistory = data.addrHistory.filter(h=>h.id!==hid);
+  render(); toast('削除しました');
 }
 async function deleteEmp(id){
   if(!confirm('この従業員データを削除しますか？（書類記録・評価も削除、KPI・資産の紐付けは解除されます）')) return;

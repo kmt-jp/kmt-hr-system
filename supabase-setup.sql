@@ -80,6 +80,22 @@ alter table public.employees add column if not exists postal_code text default '
 -- 所属＝雇用契約を結んでいる法人、勤務＝実際に働いている法人（兼務・出向で異なることがある）
 alter table public.employees add column if not exists affiliation text default '';
 alter table public.employees add column if not exists workplace   text default '';
+-- 現住所に住み始めた日（住所変更時の「変更日」）
+alter table public.employees add column if not exists address_since date;
+
+-- 住所変更履歴。住所を変えて保存すると、変更前の住所がここに1行残る。
+-- valid_from＝その住所に住み始めた日（分かる範囲で）、valid_to＝引っ越した日
+create table if not exists public.employee_address_history (
+  id          uuid primary key default gen_random_uuid(),
+  employee_id uuid not null references public.employees(id) on delete cascade,
+  postal_code text default '',
+  address     text default '',
+  valid_from  date,
+  valid_to    date,
+  recorded_by text default '',
+  created_at  timestamptz not null default now()
+);
+create index if not exists emp_addr_hist_emp_idx on public.employee_address_history (employee_id, valid_to desc);
 
 create table if not exists public.employee_docs (
   employee_id uuid not null references public.employees(id) on delete cascade,
@@ -848,6 +864,15 @@ begin
 end $$;
 revoke all on function public.mental_summary(text) from public, anon;
 grant execute on function public.mental_summary(text) to authenticated;
+
+-- 住所変更履歴：従業員本体と同じ（管理者以上は全員分、社員は自分の分だけ閲覧。書き込みは管理者以上）
+alter table public.employee_address_history enable row level security;
+drop policy if exists kmt_addr_select on public.employee_address_history;
+drop policy if exists kmt_addr_write  on public.employee_address_history;
+create policy kmt_addr_select on public.employee_address_history for select to authenticated
+  using (public.my_rank() >= 2 or (public.my_rank() = 1 and employee_id = public.my_employee_id()));
+create policy kmt_addr_write on public.employee_address_history for all to authenticated
+  using (public.my_rank() >= 2) with check (public.my_rank() >= 2);
 
 -- 5) 最初の全体管理者 -----------------------------------------------
 --    ここで登録するのはメールアドレスと権限だけです。
