@@ -434,6 +434,10 @@ const DOC_STATUSES = ['未依頼','依頼中','受領','確認済','対象外'];
 const EMP_TYPES = ['正社員','契約社員','パートタイム','業務委託','海外リモート'];
 /* 所属＝雇用契約を結んでいる法人、勤務＝実際に働いている法人。兼務・出向で食い違うことがある */
 const COMPANIES = ['株式会社KMT','大房行政書士法人'];
+/* 性別はデータ（給与システム由来）と同じ「男／女」で持つ。
+   以前の選択肢は「男性／女性」で、既存データと一致せず編集画面で空になり、保存すると消えていた */
+const GENDERS = ['男','女','その他'];
+function normGender(g){ return g==='男性'?'男' : g==='女性'?'女' : (g||''); }
 const EMP_STATUSES = ['内定','在籍','休職','退職'];
 const ZAIRYU_LIST = ['技術・人文知識・国際業務','特定技能1号','特定技能2号','技能実習','永住者','日本人の配偶者等','永住者の配偶者等','定住者','家族滞在','留学','特定活動','経営・管理','その他'];
 const ASSET_CATS = ['PC','モニター','スマートフォン','SIM/回線','ソフトウェアライセンス','クレジットカード','交通・燃料カード','鍵・カード','事務機器','その他'];
@@ -1364,7 +1368,7 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20260919.46';
+const APP_VER = 'ver.20260919.47';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
   {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
@@ -4988,57 +4992,64 @@ function openEmpForm(id){
   const isNew = !id;
   modal(`
   <h3>${isNew?'従業員登録':'従業員編集'} <span class="muted">Employee ${isNew?'registration':'edit'}</span></h3>
-  <div class="formgrid">
-    <div><label>社員番号</label><input id="f_empNo" value="${esc(e.empNo)}"></div>
-    <div><label>ステータス</label><select id="f_status">${EMP_STATUSES.map(s=>`<option ${e.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
-    <div><label>雇用区分</label><select id="f_type">${EMP_TYPES.map(s=>`<option ${e.employmentType===s?'selected':''}>${s}</option>`).join('')}</select></div>
-    <div><label>氏名（漢字・通称）</label><input id="f_nameKanji" value="${esc(e.nameKanji)}"></div>
-    <div><label>フリガナ</label><input id="f_nameKana" value="${esc(e.nameKana)}"></div>
-    <div><label>ローマ字（パスポート表記）</label><input id="f_nameRoma" value="${esc(e.nameRoma)}"></div>
-    <div><label>生年月日</label><input type="date" id="f_birth" value="${esc(e.birthDate)}"></div>
-    <div><label>性別</label><select id="f_gender"><option value="">—</option>${['男性','女性','その他'].map(s=>`<option ${e.gender===s?'selected':''}>${s}</option>`).join('')}</select></div>
-    <div><label>国籍</label><input id="f_nat" value="${esc(e.nationality)}" placeholder="日本 / インドネシア / ベトナム…"></div>
-    <div><label>外国籍（在留管理対象）</label><select id="f_isForeign"><option value="0" ${!e.isForeign?'selected':''}>いいえ</option><option value="1" ${e.isForeign?'selected':''}>はい</option></select></div>
-    <div><label>部署</label><select id="f_dept">${data.departments.map(s=>`<option ${e.department===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
-    <div><label>役職</label><input id="f_pos" value="${esc(e.position)}"></div>
-    <div><label>所属（雇用契約の法人）</label><select id="f_aff"><option value="">—</option>${COMPANIES.map(s=>`<option ${e.affiliation===s?'selected':''}>${s}</option>`).join('')}</select></div>
-    <div><label>勤務（実際に働く法人）</label><select id="f_work"><option value="">—</option>${COMPANIES.map(s=>`<option ${e.workplace===s?'selected':''}>${s}</option>`).join('')}</select></div>
-    <div><label>入社日</label><input type="date" id="f_hire" value="${esc(e.hireDate)}"></div>
-    <div><label>試用期間終了日</label><input type="date" id="f_prob" value="${esc(e.probationEnd)}"></div>
-    <div><label>契約終了日（有期の場合）</label><input type="date" id="f_cend" value="${esc(e.contractEnd)}"></div>
-    <div><label>退職日</label><input type="date" id="f_resign" value="${esc(e.resignDate)}"></div>
-  </div>
-  <div class="fieldset"><legend>連絡先 / Contact</legend><div class="formgrid">
-    <div><label>メール</label><input id="f_email" value="${esc(e.email)}"></div>
-    <div><label>電話</label><input id="f_phone" value="${esc(e.phone)}"></div>
-    <div><label>郵便番号</label><input id="f_zip" value="${esc(e.postalCode)}" placeholder="144-0051"></div>
-    <div style="grid-column:1/-1"><label>住所（海外リモートは居住国・都市）</label><input id="f_addr" value="${esc(e.address)}"></div>
-    <div><label>住所の変更日（転居日）</label><input type="date" id="f_addrSince" value="${esc(e.addressSince)}"></div>
+  <p class="muted" style="margin-bottom:8px">項目は分類ごとに番号をつけています（例：4-3 ＝ 4.連絡先・住所 の3番目）。</p>
+  <div class="fieldset"><legend>1. 基本情報</legend><div class="formgrid">
+    <div><label>1-1 社員番号</label><input id="f_empNo" value="${esc(e.empNo)}"></div>
+    <div><label>1-2 氏名（漢字・通称）</label><input id="f_nameKanji" value="${esc(e.nameKanji)}"></div>
+    <div><label>1-3 フリガナ</label><input id="f_nameKana" value="${esc(e.nameKana)}"></div>
+    <div><label>1-4 ローマ字（パスポート表記）</label><input id="f_nameRoma" value="${esc(e.nameRoma)}"></div>
+    <div><label>1-5 生年月日</label><input type="date" id="f_birth" value="${esc(e.birthDate)}"></div>
+    <div><label>1-6 性別</label><select id="f_gender"><option value="">—</option>${GENDERS.map(s=>`<option ${normGender(e.gender)===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div><label>1-7 国籍</label><input id="f_nat" value="${esc(e.nationality)}" placeholder="日本 / インドネシア / ベトナム…"></div>
+    <div><label>1-8 外国籍（在留管理対象）</label><select id="f_isForeign"><option value="0" ${!e.isForeign?'selected':''}>いいえ</option><option value="1" ${e.isForeign?'selected':''}>はい</option></select></div>
+  </div></div>
+  <div class="fieldset"><legend>2. 所属・雇用</legend><div class="formgrid">
+    <div><label>2-1 ステータス</label><select id="f_status">${EMP_STATUSES.map(s=>`<option ${e.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div><label>2-2 雇用区分</label><select id="f_type">${EMP_TYPES.map(s=>`<option ${e.employmentType===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div><label>2-3 所属（雇用契約の法人）</label><select id="f_aff"><option value="">—</option>${COMPANIES.map(s=>`<option ${e.affiliation===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div><label>2-4 勤務（実際に働く法人）</label><select id="f_work"><option value="">—</option>${COMPANIES.map(s=>`<option ${e.workplace===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div><label>2-5 部署</label><select id="f_dept">${data.departments.map(s=>`<option ${e.department===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+    <div><label>2-6 役職</label><input id="f_pos" value="${esc(e.position)}"></div>
+  </div></div>
+  <div class="fieldset"><legend>3. 雇用期間</legend><div class="formgrid">
+    <div><label>3-1 入社日</label><input type="date" id="f_hire" value="${esc(e.hireDate)}"></div>
+    <div><label>3-2 試用期間終了日</label><input type="date" id="f_prob" value="${esc(e.probationEnd)}"></div>
+    <div><label>3-3 契約終了日（有期の場合）</label><input type="date" id="f_cend" value="${esc(e.contractEnd)}"></div>
+    <div><label>3-4 退職日</label><input type="date" id="f_resign" value="${esc(e.resignDate)}"></div>
+  </div></div>
+  <div class="fieldset"><legend>4. 連絡先・住所</legend><div class="formgrid">
+    <div><label>4-1 メール</label><input id="f_email" value="${esc(e.email)}"></div>
+    <div><label>4-2 電話</label><input id="f_phone" value="${esc(e.phone)}"></div>
+    <div><label>4-3 郵便番号</label><input id="f_zip" value="${esc(e.postalCode)}" placeholder="144-0051"></div>
+    <div style="grid-column:1/-1"><label>4-4 住所（海外リモートは居住国・都市）</label><input id="f_addr" value="${esc(e.address)}"></div>
+    <div><label>4-5 住所の変更日（転居日）</label><input type="date" id="f_addrSince" value="${esc(e.addressSince)}"></div>
     <div style="grid-column:span 2;align-self:end">
       <label style="display:flex;gap:6px;align-items:center;font-weight:400">
         <input type="checkbox" id="f_addrFix" style="width:auto"> 表記の修正だけ（引っ越しではない・履歴に残さない）</label>
       <div class="muted" style="margin-top:2px">引っ越しで住所を変えたときは、変更日を入れて保存してください。変更前の住所は「住所変更履歴」に残ります。</div>
     </div>
-    <div><label>緊急連絡先 氏名</label><input id="f_emName" value="${esc(e.emergencyName)}"></div>
-    <div><label>続柄</label><input id="f_emRel" value="${esc(e.emergencyRelation)}"></div>
-    <div><label>緊急連絡先 電話</label><input id="f_emPhone" value="${esc(e.emergencyPhone)}"></div>
   </div></div>
-  <div class="fieldset"><legend>社会保険・税 / Insurance & Tax</legend><div class="formgrid">
-    <div><label>社会保険加入</label><select id="f_socIns"><option value="1" ${e.socialIns?'selected':''}>加入</option><option value="0" ${!e.socialIns?'selected':''}>未加入 / 対象外</option></select></div>
-    <div><label>雇用保険 被保険者番号</label><input id="f_empIns" value="${esc(e.empInsNo)}"></div>
-    <div><label>基礎年金番号</label><input id="f_pension" value="${esc(e.pensionNo)}"></div>
-    <div><label>マイナンバー提出</label><select id="f_myNum"><option value="0" ${!e.myNumberCollected?'selected':''}>未提出</option><option value="1" ${e.myNumberCollected?'selected':''}>提出済</option></select>
+  <div class="fieldset"><legend>5. 緊急連絡先</legend><div class="formgrid">
+    <div><label>5-1 氏名</label><input id="f_emName" value="${esc(e.emergencyName)}"></div>
+    <div><label>5-2 続柄</label><input id="f_emRel" value="${esc(e.emergencyRelation)}"></div>
+    <div><label>5-3 電話</label><input id="f_emPhone" value="${esc(e.emergencyPhone)}"></div>
+  </div></div>
+  <div class="fieldset"><legend>6. 社会保険・税</legend><div class="formgrid">
+    <div><label>6-1 社会保険加入</label><select id="f_socIns"><option value="1" ${e.socialIns?'selected':''}>加入</option><option value="0" ${!e.socialIns?'selected':''}>未加入 / 対象外</option></select></div>
+    <div><label>6-2 雇用保険 被保険者番号</label><input id="f_empIns" value="${esc(e.empInsNo)}"></div>
+    <div><label>6-3 基礎年金番号</label><input id="f_pension" value="${esc(e.pensionNo)}"></div>
+    <div><label>6-4 マイナンバー提出</label><select id="f_myNum"><option value="0" ${!e.myNumberCollected?'selected':''}>未提出</option><option value="1" ${e.myNumberCollected?'selected':''}>提出済</option></select>
     <div class="muted" style="margin-top:2px">※番号自体はこのシステムに保存しない（安全管理措置）</div></div>
   </div></div>
-  <div class="fieldset"><legend>在留・渡航情報 / Residence & Passport（外国籍・海外）</legend><div class="formgrid">
-    <div><label>在留資格</label><select id="f_zStatus"><option value="">—</option>${ZAIRYU_LIST.map(s=>`<option ${e.zairyuStatus===s?'selected':''}>${s}</option>`).join('')}</select></div>
-    <div><label>在留カード番号</label><input id="f_zCard" value="${esc(e.zairyuCardNo)}"></div>
-    <div><label>在留期限</label><input type="date" id="f_zExp" value="${esc(e.zairyuExpiry)}"></div>
-    <div><label>パスポート番号</label><input id="f_pNo" value="${esc(e.passportNo)}"></div>
-    <div><label>パスポート期限</label><input type="date" id="f_pExp" value="${esc(e.passportExpiry)}"></div>
-    <div><label>取次者証期限（申請等取次者証明書）</label><input type="date" id="f_tori" value="${esc(e.toritsugiExpiry)}"></div>
+  <div class="fieldset"><legend>7. 在留・渡航情報（外国籍・海外の方）</legend><div class="formgrid">
+    <div><label>7-1 在留資格</label><select id="f_zStatus"><option value="">—</option>${ZAIRYU_LIST.map(s=>`<option ${e.zairyuStatus===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div><label>7-2 在留カード番号</label><input id="f_zCard" value="${esc(e.zairyuCardNo)}"></div>
+    <div><label>7-3 在留期限</label><input type="date" id="f_zExp" value="${esc(e.zairyuExpiry)}"></div>
+    <div><label>7-4 パスポート番号</label><input id="f_pNo" value="${esc(e.passportNo)}"></div>
+    <div><label>7-5 パスポート期限</label><input type="date" id="f_pExp" value="${esc(e.passportExpiry)}"></div>
+    <div><label>7-6 取次者証期限（申請等取次者証明書）</label><input type="date" id="f_tori" value="${esc(e.toritsugiExpiry)}"></div>
   </div></div>
-  <div class="fieldset"><legend>メモ / Notes</legend>
+  <div class="fieldset"><legend>8. メモ</legend>
     <textarea id="f_notes" rows="3" style="width:100%">${esc(e.notes)}</textarea>
   </div>
   <div class="modal-actions">
@@ -5991,11 +6002,11 @@ function exportAssetCsv(){
 async function loadSample(){
   const y = new Date().getFullYear();
   const mk = (o)=>Object.assign({id:uid(), docs:{}, socialIns:true, myNumberCollected:false, notes:''}, o);
-  const e1 = mk({empNo:'001', status:'在籍', nameKanji:'山田 太郎', nameKana:'ヤマダ タロウ', nameRoma:'YAMADA Taro', birthDate:'1985-04-12', gender:'男性', nationality:'日本', isForeign:false, employmentType:'正社員', department:'管理部', position:'部長', hireDate:'2020-04-01', email:'yamada@example.com', phone:'090-0000-0001'});
-  const e2 = mk({empNo:'002', status:'在籍', nameKanji:'グエン ティ フォン', nameKana:'グエン ティ フォン', nameRoma:'NGUYEN Thi Phuong', birthDate:'1995-08-23', gender:'女性', nationality:'ベトナム', isForeign:true, employmentType:'正社員', department:'支援部', position:'支援担当', hireDate:'2023-10-01', zairyuStatus:'技術・人文知識・国際業務', zairyuCardNo:'AB12345678CD', zairyuExpiry:`${y}-09-15`, passportNo:'N1234567', passportExpiry:`${y+2}-03-01`, email:'phuong@example.com'});
-  const e3 = mk({empNo:'003', status:'在籍', nameKanji:'佐藤 花子', nameKana:'サトウ ハナコ', nameRoma:'SATO Hanako', birthDate:'1990-01-30', gender:'女性', nationality:'日本', isForeign:false, employmentType:'パートタイム', department:'管理部', position:'事務', hireDate:'2024-06-01', socialIns:false});
-  const e4 = mk({empNo:'004', status:'在籍', nameKanji:'ブディ サントソ', nameKana:'ブディ サントソ', nameRoma:'Budi SANTOSO', birthDate:'1993-11-05', gender:'男性', nationality:'インドネシア', isForeign:false, employmentType:'海外リモート', department:'海外事業部', position:'現地コーディネーター', hireDate:'2024-01-15', address:'インドネシア・ジャカルタ', socialIns:false, email:'budi@example.com'});
-  const e5 = mk({empNo:'005', status:'内定', nameKanji:'キン ミャッ トゥ', nameKana:'キン ミャッ トゥ', nameRoma:'Khin Myat Thu', birthDate:'1998-02-14', gender:'女性', nationality:'ミャンマー', isForeign:true, employmentType:'正社員', department:'支援部', position:'支援担当（予定）', hireDate:`${y}-10-01`, zairyuStatus:'留学', zairyuExpiry:`${y+1}-03-31`, notes:'在留資格変更（技人国）申請予定'});
+  const e1 = mk({empNo:'001', status:'在籍', nameKanji:'山田 太郎', nameKana:'ヤマダ タロウ', nameRoma:'YAMADA Taro', birthDate:'1985-04-12', gender:'男', nationality:'日本', isForeign:false, employmentType:'正社員', department:'管理部', position:'部長', hireDate:'2020-04-01', email:'yamada@example.com', phone:'090-0000-0001'});
+  const e2 = mk({empNo:'002', status:'在籍', nameKanji:'グエン ティ フォン', nameKana:'グエン ティ フォン', nameRoma:'NGUYEN Thi Phuong', birthDate:'1995-08-23', gender:'女', nationality:'ベトナム', isForeign:true, employmentType:'正社員', department:'支援部', position:'支援担当', hireDate:'2023-10-01', zairyuStatus:'技術・人文知識・国際業務', zairyuCardNo:'AB12345678CD', zairyuExpiry:`${y}-09-15`, passportNo:'N1234567', passportExpiry:`${y+2}-03-01`, email:'phuong@example.com'});
+  const e3 = mk({empNo:'003', status:'在籍', nameKanji:'佐藤 花子', nameKana:'サトウ ハナコ', nameRoma:'SATO Hanako', birthDate:'1990-01-30', gender:'女', nationality:'日本', isForeign:false, employmentType:'パートタイム', department:'管理部', position:'事務', hireDate:'2024-06-01', socialIns:false});
+  const e4 = mk({empNo:'004', status:'在籍', nameKanji:'ブディ サントソ', nameKana:'ブディ サントソ', nameRoma:'Budi SANTOSO', birthDate:'1993-11-05', gender:'男', nationality:'インドネシア', isForeign:false, employmentType:'海外リモート', department:'海外事業部', position:'現地コーディネーター', hireDate:'2024-01-15', address:'インドネシア・ジャカルタ', socialIns:false, email:'budi@example.com'});
+  const e5 = mk({empNo:'005', status:'内定', nameKanji:'キン ミャッ トゥ', nameKana:'キン ミャッ トゥ', nameRoma:'Khin Myat Thu', birthDate:'1998-02-14', gender:'女', nationality:'ミャンマー', isForeign:true, employmentType:'正社員', department:'支援部', position:'支援担当（予定）', hireDate:`${y}-10-01`, zairyuStatus:'留学', zairyuExpiry:`${y+1}-03-31`, notes:'在留資格変更（技人国）申請予定'});
   const emps = [e1,e2,e3,e4,e5];
   [['d01','確認済'],['d02','確認済'],['d03','確認済'],['d20','確認済'],['d21','確認済'],['d27','確認済']].forEach(([d,s])=>{ e1.docs[d]={status:s,date:'2020-04-01',note:''}; });
   [['d01','確認済'],['d03','確認済'],['d07','確認済'],['d08','確認済'],['d30','確認済'],['d21','受領']].forEach(([d,s])=>{ e2.docs[d]={status:s,date:'2023-10-01',note:''}; });
