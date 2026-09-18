@@ -891,9 +891,10 @@ function buildAlerts(){
     } else if(dEnd!==null && dEnd<=90){
       alerts.push({level:dEnd<=30?'red':'yellow', lic:l,
         text:`【許可】${l.name} 更新申請の期限 ${s.end}（${fmtDays(dEnd)}）— 満了日 ${l.validTo}`, sort:-1000+dEnd});
-    } else if(dPrep!==null && dPrep<=0 && dEnd!==null){
-      alerts.push({level:'blue', lic:l,
-        text:`【許可】${l.name} 更新準備の時期です（申請できる期間 ${s.start} 〜 ${s.end}）`, sort:-500});
+    } else if(dPrep!==null && dPrep<=0){
+      /* 満了日の7か月前から出すリマインド。サイドバーの「注意」に数えるため黄色にする */
+      alerts.push({level:'yellow', lic:l,
+        text:`【許可】${l.name} 更新の準備を始める時期です（満了 ${l.validTo}・あと${dTo}日／申請できる期間 ${s.start||'—'} 〜 ${s.end||'—'}）`, sort:-500});
     }
   });
   alerts.sort((a,b)=>a.sort-b.sort);
@@ -1363,7 +1364,7 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20260919.45';
+const APP_VER = 'ver.20260919.46';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
   {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
@@ -4409,6 +4410,9 @@ async function setWfTopicDone(id, done){
 /* 更新スケジュールは満了日から自動計算する（手入力の値があればそちらを優先）。
    ・ssw   ＝登録支援機関：満了日の「6か月前の月の初日」〜「4か月前の月末」
    ・shokai＝職業紹介事業：満了日の3か月前まで（開始の目安はその1か月前） */
+/* 満了日の何か月前からリマインドを出すか（全許可証共通）。
+   登録支援機関の申請開始（6か月前の月初）より前に準備を始められるよう7か月にしている。 */
+const LIC_REMIND_MONTHS = 7;
 const LICENSE_RULES = {
   ssw:    {label:'登録支援機関（出入国在留管理庁）', startMonths:6, endMonths:4, endOfMonth:true},
   shokai: {label:'職業紹介事業（厚生労働省）',       startMonths:4, endMonths:3, endOfMonth:false},
@@ -4441,8 +4445,9 @@ function licSchedule(l){
       }
     }
   }
-  // 準備開始の目安：申請開始の1か月前
+  // リマインド開始：満了日の7か月前（手入力があればそちらを優先）
   let prep = l.prepStart;
+  if(!prep && l.validTo){ const p = addMonths(l.validTo, LIC_REMIND_MONTHS); prep = iso(p); }
   if(!prep && start){ const p = addMonths(start, 1); prep = iso(p); }
   return {start, end, prep};
 }
@@ -4487,7 +4492,7 @@ function licCardHtml(l){
     else if(dEnd !== null && dEnd < 0){ badge = '<span class="badge b-red">更新申請期限を経過</span>'; level='red'; }
     else if(dEnd !== null && dEnd <= 30){ badge = `<span class="badge b-red">申請期限まで${dEnd}日</span>`; level='red'; }
     else if(dEnd !== null && dEnd <= 90){ badge = `<span class="badge b-yellow">申請期限まで${dEnd}日</span>`; level='yellow'; }
-    else if(dPrep !== null && dPrep <= 0){ badge = '<span class="badge b-blue">更新の準備期間</span>'; level='blue'; }
+    else if(dPrep !== null && dPrep <= 0){ badge = `<span class="badge b-yellow">更新準備（満了まで${dTo}日）</span>`; level='yellow'; }
     else { badge = `<span class="badge b-green">有効（あと${dTo}日）</span>`; }
   }
   const docs = l.docs||[];
@@ -4515,7 +4520,7 @@ function licCardHtml(l){
           ${row('所管', esc(l.authority))}
           ${row('有効期間', l.validFrom||l.validTo ? `${fmtDate(l.validFrom)} 〜 <b>${fmtDate(l.validTo)}</b>` : '')}
           ${row('更新後の期間', esc(l.renewPeriod))}
-          <dt>準備開始の目安</dt><dd>${fmtDate(s.prep)}${dPrep!==null&&dPrep<=0?' <span class="badge b-blue">開始時期</span>':''}</dd>
+          <dt>リマインド開始</dt><dd>${fmtDate(s.prep)} <span class="muted small">（満了の${LIC_REMIND_MONTHS}か月前）</span>${dPrep!==null&&dPrep<=0?' <span class="badge b-yellow">準備中</span>':''}</dd>
           <dt>申請できる期間</dt><dd>${s.start?fmtDate(s.start):'—'} 〜 <b>${s.end?fmtDate(s.end):'—'}</b></dd>
           ${row('手数料', esc(l.fee))}
         </dl>
@@ -4576,10 +4581,10 @@ function renderLicModal(isNew){
   <div class="fieldset"><legend>更新スケジュール</legend>
     ${l.renewRule? `<p class="muted" style="margin-bottom:8px">満了日から自動計算しています（空欄のままで構いません）。
       手入力すると、そちらが優先されます。<br>
-      → 準備開始 <b>${fmtDate(s.prep)}</b>／申請できる期間 <b>${s.start?fmtDate(s.start):'—'} 〜 ${s.end?fmtDate(s.end):'—'}</b></p>`
+      → リマインド開始（満了の${LIC_REMIND_MONTHS}か月前） <b>${fmtDate(s.prep)}</b>／申請できる期間 <b>${s.start?fmtDate(s.start):'—'} 〜 ${s.end?fmtDate(s.end):'—'}</b></p>`
       : '<p class="muted" style="margin-bottom:8px">規則を選ぶと自動計算されます。手入力も可能です。</p>'}
     <div class="formgrid">
-      <div><label>準備開始</label><input type="date" id="lc_prep" value="${esc(l.prepStart)}" placeholder="${esc(s.prep)}"></div>
+      <div><label>リマインド開始（空欄＝満了の7か月前）</label><input type="date" id="lc_prep" value="${esc(l.prepStart)}" placeholder="${esc(s.prep)}"></div>
       <div><label>申請開始日</label><input type="date" id="lc_rs" value="${esc(l.renewStart)}"></div>
       <div><label>申請期限</label><input type="date" id="lc_re" value="${esc(l.renewEnd)}"></div>
     </div>
