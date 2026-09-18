@@ -433,7 +433,9 @@ const STAGES = ['入社前','入社時','在職中','退職時','退職後'];
 const DOC_STATUSES = ['未依頼','依頼中','受領','確認済','対象外'];
 const EMP_TYPES = ['正社員','契約社員','パートタイム','業務委託','海外リモート'];
 /* 所属＝雇用契約を結んでいる法人、勤務＝実際に働いている法人。兼務・出向で食い違うことがある */
-const COMPANIES = ['株式会社KMT','大房行政書士法人'];
+/* 所属は雇用契約を結ぶ法人（82Worksと契約している人もいる）。勤務は実際に働く拠点で、KMTか大房のどちらか */
+const AFFILIATIONS = ['株式会社KMT','大房行政書士法人','株式会社82Works'];
+const COMPANIES    = ['株式会社KMT','大房行政書士法人'];
 /* 性別はデータ（給与システム由来）と同じ「男／女」で持つ。
    以前の選択肢は「男性／女性」で、既存データと一致せず編集画面で空になり、保存すると消えていた */
 const GENDERS = ['男','女','その他'];
@@ -1368,7 +1370,7 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20260919.47';
+const APP_VER = 'ver.20260919.48';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
   {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
@@ -5006,7 +5008,7 @@ function openEmpForm(id){
   <div class="fieldset"><legend>2. 所属・雇用</legend><div class="formgrid">
     <div><label>2-1 ステータス</label><select id="f_status">${EMP_STATUSES.map(s=>`<option ${e.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
     <div><label>2-2 雇用区分</label><select id="f_type">${EMP_TYPES.map(s=>`<option ${e.employmentType===s?'selected':''}>${s}</option>`).join('')}</select></div>
-    <div><label>2-3 所属（雇用契約の法人）</label><select id="f_aff"><option value="">—</option>${COMPANIES.map(s=>`<option ${e.affiliation===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    <div><label>2-3 所属（雇用契約の法人）</label><select id="f_aff"><option value="">—</option>${AFFILIATIONS.map(s=>`<option ${e.affiliation===s?'selected':''}>${s}</option>`).join('')}</select></div>
     <div><label>2-4 勤務（実際に働く法人）</label><select id="f_work"><option value="">—</option>${COMPANIES.map(s=>`<option ${e.workplace===s?'selected':''}>${s}</option>`).join('')}</select></div>
     <div><label>2-5 部署</label><select id="f_dept">${data.departments.map(s=>`<option ${e.department===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
     <div><label>2-6 役職</label><input id="f_pos" value="${esc(e.position)}"></div>
