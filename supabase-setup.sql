@@ -341,6 +341,12 @@ alter table public.jd_items add column if not exists standard text default '';
 alter table public.jd_items add column if not exists metric   text default '';
 alter table public.jd_items add column if not exists target   text default '';
 alter table public.jd_items add column if not exists legal    text default '';
+-- JD 2026案の列（番号・具体的な作業内容・必要なスキル・システムの画面・頻度）
+alter table public.jd_items add column if not exists code       text default '';
+alter table public.jd_items add column if not exists detail     text default '';
+alter table public.jd_items add column if not exists skills     text default '';
+alter table public.jd_items add column if not exists system_ref text default '';
+alter table public.jd_items add column if not exists frequency  text default '';
 
 -- 実績の記録（期ごとに1項目1つ）。実績指標が入っている項目にだけ入力欄が出る。
 create table if not exists public.jd_metrics (
@@ -367,10 +373,18 @@ create table if not exists public.jd_checks (
   employee_id uuid not null references public.employees(id) on delete cascade,
   period      text not null,
   item_id     uuid not null references public.jd_items(id) on delete cascade,
-  mark        text not null check (mark in ('〇','△','×')),
+  mark        text check (mark in ('〇','△','×','対象外')),       -- 自己評価（上長評価だけの行もあるので null 可）
+  mgr_mark    text check (mgr_mark is null or mgr_mark in ('〇','△','×','対象外')),  -- 上長評価（管理者以上だけ。下のトリガーで保護）
   updated_at  timestamptz not null default now(),
   unique (employee_id, period, item_id)
 );
+-- 既存DB向け：2026案で「上長評価」と「対象外」を追加した
+alter table public.jd_checks add column if not exists mgr_mark text;
+alter table public.jd_checks alter column mark drop not null;
+alter table public.jd_checks drop constraint if exists jd_checks_mark_check;
+alter table public.jd_checks add  constraint jd_checks_mark_check check (mark in ('〇','△','×','対象外'));
+alter table public.jd_checks drop constraint if exists jd_checks_mgr_mark_check;
+alter table public.jd_checks add  constraint jd_checks_mgr_mark_check check (mgr_mark is null or mgr_mark in ('〇','△','×','対象外'));
 
 grant usage on schema public to anon, authenticated;
 grant select, insert, update, delete on all tables in schema public to authenticated;
@@ -692,6 +706,19 @@ create policy kmt_jdc_select on public.jd_checks for select to authenticated
 create policy kmt_jdc_write on public.jd_checks for all to authenticated
   using (public.my_rank() >= 2 or employee_id = public.my_employee_id())
   with check (public.my_rank() >= 2 or employee_id = public.my_employee_id());
+-- 上長評価(mgr_mark)は管理者以上だけが書ける。本人が自分の行を書き換えても上長評価は元のまま残す。
+create or replace function public.guard_jd_mgr_mark() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if public.my_rank() < 2 then
+    if tg_op = 'INSERT' then new.mgr_mark := null;
+    else new.mgr_mark := old.mgr_mark; end if;
+  end if;
+  return new;
+end $$;
+drop trigger if exists guard_jd_mgr_mark_trg on public.jd_checks;
+create trigger guard_jd_mgr_mark_trg before insert or update on public.jd_checks
+  for each row execute function public.guard_jd_mgr_mark();
 
 -- 担当職種は誰のものでも見えてよい（誰が何を担当しているかは社内で共有する情報）が、
 -- 書き換えは本人と管理者だけ。

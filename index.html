@@ -299,8 +299,15 @@ button.btn.ghost{background:#fff;color:var(--sub);border:1px solid var(--border)
 .addr-hist td{padding:4px 6px}
 .wf-who{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px}
 table.jd td{font-size:13px;vertical-align:middle}
-table.jd td:last-child{width:110px;white-space:nowrap;vertical-align:top;padding-top:8px}
+table.jd td.jd-eval{width:120px;white-space:nowrap;vertical-align:top;padding-top:8px}
+table.jd th{font-size:11px}
 table.jd .badge{margin-left:6px}
+.jd-code{display:inline-block;min-width:44px;font-size:11px;font-weight:700;color:var(--sub);margin-right:4px}
+.jd-meta{font-size:11px;color:var(--sub);margin-top:2px}
+.jd-more{margin-top:3px;font-size:11px;color:var(--sub)}
+.jd-more summary{cursor:pointer;color:var(--accent);font-weight:600}
+.jd-more div{margin-top:3px;padding-left:8px;border-left:2px solid var(--border);white-space:pre-wrap;line-height:1.6}
+.lvseg button.na{font-size:10px;padding-left:5px;padding-right:5px}
 .small{font-size:11px}
 .nowrap{white-space:nowrap}
 /* 英語併記（日本語の横に淡色の英語） */
@@ -756,12 +763,13 @@ async function loadAll(){
   data.wfIdeas     = wfi||[];
   data.jdItems  = (jdi||[]).map(r=>({id:r.id, dept:r.dept||'', block:r.block, subdesk:r.subdesk||'',
     track:r.track||'共通', item:r.item, skillId:r.skill_id||'',
+    code:r.code||'', detail:r.detail||'', skills:r.skills||'', systemRef:r.system_ref||'', frequency:r.frequency||'',
     standard:r.standard||'', metric:r.metric||'', target:r.target||'', legal:r.legal||'',
     flag:r.flag||'', note:r.note||'', active:r.active!==false, sortOrder:r.sort_order||0}));
   data.jdMetrics = (jdm||[]).map(r=>({id:r.id, empId:r.employee_id, period:r.period,
     itemId:r.item_id, value:r.value, note:r.note||''}));
   data.jdChecks = (jdc||[]).map(r=>({id:r.id, empId:r.employee_id, period:r.period,
-    itemId:r.item_id, mark:r.mark}));
+    itemId:r.item_id, mark:r.mark||'', mgrMark:r.mgr_mark||''}));
   data.jdAssignments = (jda||[]).map(r=>({id:r.id, empId:r.employee_id, dept:r.dept, track:r.track}));
   data.roleSkillTargets = rst||[];
   data.mandalaCharts = (mnd||[]).map(m=>({id:m.id, scope:m.scope, empId:m.employee_id,
@@ -1370,7 +1378,7 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20260919.50';
+const APP_VER = 'ver.20260919.51';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
   {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
@@ -3663,7 +3671,11 @@ const JD_BLOCKS = [
 ];
 const JD_MARKS   = ['〇','△','×'];
 const JD_MARK_PT = {'〇':1, '△':0.5, '×':0};
-const JD_MARK_LABEL = {'〇':'一人でできる', '△':'助けがあればできる', '×':'まだできない'};
+const JD_MARK_LABEL = {'〇':'一人でできる', '△':'助けがあればできる', '×':'まだできない', '対象外':'自分の担当ではない（達成率から外す）'};
+/* 兼務が多いので、担当しない項目は「対象外」にして分母から外す（2026案「読み方」シートの運用） */
+const JD_NA = '対象外';
+/* 部署の並び順（2026案の全体一覧と同じ）。ここに無い部署は後ろに名前順で並ぶ */
+const JD_DEPT_ORDER = ['営業','GLT','総務','人事・労務','社内管理','法人内'];
 const JD_FLAGS = {
   old:{label:'制度が変わった', cls:'b-red'},
   chk:{label:'社内で要確認',   cls:'b-yellow'},
@@ -3836,9 +3848,12 @@ function blockLabel(key){
   return b? b.name : key;
 }
 function jdItemsAll(){ return (data.jdItems||[]).slice().sort((a,b)=>a.sortOrder-b.sortOrder); }
+function jdDeptSort(ds){
+  const ix = d=>{ const n = JD_DEPT_ORDER.indexOf(d); return n<0? 999 : n; };
+  return ds.sort((a,b)=> ix(a)-ix(b) || a.localeCompare(b));
+}
 function jdDepts(){
-  const ds = [...new Set(jdItemsAll().filter(i=>i.active).map(i=>i.dept||'（未分類）'))];
-  return ds.sort((a,b)=> a==='営業部'? -1 : b==='営業部'? 1 : a.localeCompare(b));
+  return jdDeptSort([...new Set(jdItemsAll().filter(i=>i.active).map(i=>i.dept||'（未分類）'))]);
 }
 /* その部署で使われている職種（「共通」しか無ければ職種の切り替えは出さない） */
 function jdTracksOf(dept){
@@ -3858,26 +3873,33 @@ function jdItemsFor(dept, tracks){
   return jdItemsAll().filter(i=>i.active && (i.dept||'（未分類）')===dept
     && ((i.track||'共通')==='共通' || tracks.includes(i.track)));
 }
-function jdMarkOf(empId, period, itemId){
+/* who: 'self'＝自己評価、'mgr'＝上長評価、'eff'＝上長評価があればそれ、無ければ自己評価（達成率に使う） */
+function jdMarkOf(empId, period, itemId, who='eff'){
   const c = data.jdChecks.find(x=>x.empId===empId && x.period===period && x.itemId===itemId);
-  return c? c.mark : '';
+  if(!c) return '';
+  return who==='self'? (c.mark||'') : who==='mgr'? (c.mgrMark||'') : (c.mgrMark||c.mark||'');
 }
+/* 2026案の「実績の可視化」は“何で確認するか”の説明文なので、数字の入力欄は出さずに文として見せる。
+   番号(code)の付いた項目＝2026案。目安(target)を入れた項目は数字で記録する。 */
+function jdMetricIsText(i){ return !!(i.code && i.metric && !i.target); }
 function jdMetricOf(empId, period, itemId){
   const r = (data.jdMetrics||[]).find(x=>x.empId===empId && x.period===period && x.itemId===itemId);
   return r && r.value!=null ? r.value : null;
 }
-/* 達成率は「答えた項目のうち」で出す（〇=1・△=0.5）。未回答の数は別に出して誤解を防ぐ。 */
-function jdRate(empId, period, items){
-  let pt=0, n=0;
-  items.forEach(i=>{ const m=jdMarkOf(empId, period, i.id); if(m){ pt += JD_MARK_PT[m]; n++; } });
-  return {pct: n? Math.round(pt/n*100) : null, answered:n, total:items.length};
+/* 達成率は「答えた項目のうち」で出す（〇=1・△=0.5）。未回答の数は別に出して誤解を防ぐ。
+   「対象外」は分母からも外す（total も減る）。 */
+function jdRate(empId, period, items, who='eff'){
+  let pt=0, n=0, na=0;
+  items.forEach(i=>{ const m=jdMarkOf(empId, period, i.id, who);
+    if(m===JD_NA) na++; else if(m){ pt += JD_MARK_PT[m]; n++; } });
+  return {pct: n? Math.round(pt/n*100) : null, answered:n, total:items.length-na, na};
 }
 /* 職務チェックの結果を、項目に紐づいたスキルのカテゴリごとにまとめ、スキル評価と突き合わせる */
 function jdSkillCompare(empId, period, items){
   const acc = {};
   (items || jdItemsAll().filter(i=>i.active)).forEach(i=>{
     const s = data.skillDefs.find(x=>x.id===i.skillId); if(!s) return;
-    const m = jdMarkOf(empId, period, i.id); if(!m) return;
+    const m = jdMarkOf(empId, period, i.id); if(!m || m===JD_NA) return;
     const a = acc[s.category] || (acc[s.category] = {pt:0, n:0});
     a.pt += JD_MARK_PT[m]; a.n++;
   });
@@ -3918,7 +3940,7 @@ function jdHtml(){
   const shown     = jdItemsFor(jdDept, myTracks);
   const flagged   = shown.filter(i=>i.flag).length;
   const tot       = jdRate(jdEmpId, selfingPeriod, shown);
-  const hasMetric  = shown.some(i=>i.metric);          // 実績欄を出す部署かどうか
+  const hasMetric  = shown.some(i=>i.metric && !jdMetricIsText(i));   // 数字を入れる実績欄を出す部署かどうか
   const showTracks = deptTracks.length > 0;            // 職種が分かれていない部署では出さない
   const legalCount = shown.filter(i=>i.legal).length;
 
@@ -3945,24 +3967,34 @@ function jdHtml(){
       ${s.key? `<div class="jd-sub">${esc(s.key)}
         <span class="muted small">${sr.pct==null?'未回答':`${sr.pct}%（${sr.answered}/${sr.total}）`}</span></div>`:''}
       <div class="tablewrap"><table class="jd">
+        <tr><th>業務</th>${hasMetric?'<th>実績</th>':''}<th class="center">自己評価</th><th class="center">上長評価</th></tr>
         ${items.map(i=>{
-          const m = jdMarkOf(jdEmpId, selfingPeriod, i.id);
+          const ms = jdMarkOf(jdEmpId, selfingPeriod, i.id, 'self');
+          const mm = jdMarkOf(jdEmpId, selfingPeriod, i.id, 'mgr');
           const f = JD_FLAGS[i.flag];
           const tr = i.track || '共通';
           const mv = jdMetricOf(jdEmpId, selfingPeriod, i.id);
-          return `<tr>
-            <td>${showTracks? `<span class="badge" style="background:${TRACK_COLORS[tr]}1a;color:${TRACK_COLORS[tr]};margin-right:6px">${esc(tr)}</span>`:''}${esc(i.item)}
+          const seg = (cur, who, can)=> `<span class="lvseg">${[...JD_MARKS, JD_NA].map(k=>
+              `<button class="${cur===k?'on':''} ${k===JD_NA?'na':''}" ${can?'':'disabled'} title="${JD_MARK_LABEL[k]}"
+                onclick="setJdMark('${i.id}','${k}','${who}')">${k===JD_NA?'外':k}</button>`).join('')}</span>`;
+          const meta = [i.frequency && `頻度：${esc(i.frequency)}`, i.systemRef && i.systemRef!=='—' && `システム：${esc(i.systemRef)}`,
+                        jdMetricIsText(i) && `実績の確認：${esc(i.metric)}`].filter(Boolean).join('　');
+          return `<tr class="${(mm||ms)===JD_NA?'muted':''}">
+            <td>${i.code? `<span class="jd-code">${esc(i.code)}</span>`:''}${showTracks? `<span class="badge" style="background:${TRACK_COLORS[tr]}1a;color:${TRACK_COLORS[tr]};margin:0 6px 0 0">${esc(tr)}</span>`:''}${esc(i.item)}
               ${i.legal? `<span class="badge b-purple" title="法令で決まっている業務">${esc(i.legal)}</span>`:''}
               ${f? `<span class="badge ${f.cls}" title="${esc(i.note)}">${f.label}</span>`:''}
-              ${i.standard? `<div class="jd-std">〇の基準：${esc(i.standard)}</div>`:''}
+              ${i.standard? `<div class="jd-std">〇の目安：${esc(i.standard)}</div>`:''}
+              ${meta? `<div class="jd-meta">${meta}</div>`:''}
+              ${(i.detail||i.skills)? `<details class="jd-more"><summary>作業内容・必要なスキル</summary>
+                ${i.detail? `<div><b>作業内容</b>　${esc(i.detail)}</div>`:''}
+                ${i.skills? `<div><b>必要なスキル・知識</b>　${esc(i.skills)}</div>`:''}</details>`:''}
               ${i.note? `<div class="muted small">${esc(i.note)}</div>`:''}</td>
-            ${hasMetric? `<td class="jd-metric">${i.metric? `
+            ${hasMetric? `<td class="jd-metric">${i.metric && !jdMetricIsText(i)? `
               <div class="muted small">${esc(i.metric)}${i.target?`／目安 ${esc(i.target)}`:''}</div>
               <input type="number" step="any" value="${mv==null?'':mv}" ${editable?'':'disabled'}
                 placeholder="実績" onchange="setJdMetric('${i.id}', this.value)">`:''}</td>`:''}
-            <td class="center nowrap"><span class="lvseg">${JD_MARKS.map(k=>
-              `<button class="${m===k?'on':''}" ${editable?'':'disabled'} title="${JD_MARK_LABEL[k]}"
-                onclick="setJdMark('${i.id}','${k}')">${k}</button>`).join('')}</span></td>
+            <td class="center jd-eval">${seg(ms, 'self', editable)}</td>
+            <td class="center jd-eval">${seg(mm, 'mgr', canEdit())}</td>
           </tr>`;
         }).join('')}
       </table></div>`;
@@ -3997,7 +4029,9 @@ function jdHtml(){
       return `<span class="badge b-purple" title="登録支援機関の義務的支援・職業紹介事業の遵守事項にあたる項目">法令${legalCount}件 ${lr.pct==null?'未回答':lr.pct+'%'}</span>`; })() : ''}
     ${flagged? `<button class="btn small ${jdShowFlag?'':'ghost'}" onclick="jdShowFlag=!jdShowFlag;render()">⚑ 要調整 ${flagged}件</button>`:''}
     <div class="spacer"></div>
-    <span class="muted">〇=${JD_MARK_LABEL['〇']}／△=${JD_MARK_LABEL['△']}／×=${JD_MARK_LABEL['×']}</span>
+    ${(()=>{ const mr = jdRate(jdEmpId, selfingPeriod, shown, 'mgr');
+      return `<span class="badge ${mr.answered+mr.na? 'b-green':'b-gray'}" title="上長評価が付いた項目は、達成率に上長評価を使います">上長評価 ${mr.answered+mr.na}/${shown.length}</span>`; })()}
+    <span class="muted small">〇=${JD_MARK_LABEL['〇']}／△=${JD_MARK_LABEL['△']}／×=${JD_MARK_LABEL['×']}／外=対象外（担当しない・分母から外す）</span>
     ${canEdit()? `<button class="btn small ghost" onclick="jdMaster=true;render()">⚙ 項目マスタ</button>`:''}
   </div>
   ${deptTracks.length? `
@@ -4015,6 +4049,8 @@ function jdHtml(){
     ${trackRates.map(x=>`<span class="badge" style="background:${TRACK_COLORS[x.t]}1a;color:${TRACK_COLORS[x.t]}">${esc(x.t)} ${x.r.pct==null?'未回答':x.r.pct+'%'}<span class="small">（${x.r.answered}/${x.r.total}）</span></span>`).join('')}
     ${commonRate.total? `<span class="badge" style="background:${TRACK_COLORS['共通']}1a;color:${TRACK_COLORS['共通']}">共通 ${commonRate.pct==null?'未回答':commonRate.pct+'%'}<span class="small">（${commonRate.answered}/${commonRate.total}）</span></span>`:''}
   </div>`:''}`:''}
+  <p class="muted small" style="margin:6px 0 0">評価は半年ごと：①本人が自己評価 → ②上長が上長評価（管理者のみ入力可）→ ③面談で確認。
+    兼務が多いので、担当していない項目は「外」（対象外）にしてください。達成率は上長評価があればそれを、無ければ自己評価を使います。</p>
   ${blocks || '<div class="muted">表示する項目がありません。</div>'}
   ${cmp.length? `
   <div class="section-title" style="margin-top:20px">職務チェック × スキル評価</div>
@@ -4037,7 +4073,8 @@ function jdHtml(){
 
 /* 項目マスタ（管理者のみ）。文面・対応スキル・印・使う／使わないをここで直す。 */
 function jdMasterHtml(){
-  const depts = [...new Set(jdItemsAll().map(i=>i.dept||'（未分類）'))];
+  const act = jdDepts();   // 使用中の部署を先に、停止中だけの旧版はその後ろ
+  const depts = [...act, ...jdDeptSort([...new Set(jdItemsAll().map(i=>i.dept||'（未分類）'))].filter(d=>!act.includes(d)))];
   if(!jdDept || !depts.includes(jdDept)) jdDept = depts[0];
   const items = jdItemsAll().filter(i=>(i.dept||'（未分類）')===jdDept);
   const subdesks = [...new Set(jdItemsAll().filter(i=>(i.dept||'（未分類）')===jdDept && i.subdesk).map(i=>i.subdesk))];
@@ -4046,7 +4083,7 @@ function jdMasterHtml(){
   <div class="toolbar">
     <button class="btn small ghost" onclick="jdMaster=false;render()">← チェックに戻る</button>
     <select onchange="jdDept=this.value;render()">
-      ${depts.map(d=>`<option ${d===jdDept?'selected':''}>${esc(d)}</option>`).join('')}
+      ${depts.map(d=>`<option value="${esc(d)}" ${d===jdDept?'selected':''}>${esc(d)}${act.includes(d)?'':'（停止中）'}</option>`).join('')}
     </select>
     <span class="badge b-blue">${items.filter(i=>i.active).length} 項目（停止中 ${items.filter(i=>!i.active).length}）</span>
     <div class="spacer"></div>
@@ -4057,24 +4094,34 @@ function jdMasterHtml(){
   <datalist id="jd_subs">${subdesks.map(s=>`<option value="${esc(s)}">`).join('')}</datalist>
   <datalist id="jd_blocks">${blocks.map(b=>`<option value="${esc(b)}">`).join('')}</datalist>
   <div class="tablewrap"><table>
-    <tr><th style="width:140px">大分類 / サブデスク</th><th>項目 / 評価内容</th><th style="width:150px">実績指標</th><th style="width:90px">職種</th>
+    <tr><th style="width:140px">番号 / カテゴリ / サブデスク</th><th>業務 / 〇の目安 / 作業内容 / 必要なスキル</th><th style="width:170px">実績の確認 / 画面 / 頻度</th><th style="width:90px">職種</th>
         <th style="width:150px">対応スキル</th><th style="width:100px">印</th><th style="width:44px">使う</th><th style="width:34px"></th></tr>
     ${items.map(i=>`<tr class="${i.active?'':'muted'}">
-      <td><input list="jd_blocks" value="${esc(i.block)}" style="width:100%" title="大分類"
+      <td><input value="${esc(i.code)}" placeholder="番号（例 営-01）" style="width:100%;margin-bottom:3px" title="番号"
+            onchange="updJdItem('${i.id}','code',this.value)">
+        <input list="jd_blocks" value="${esc(i.block)}" style="width:100%" title="カテゴリ（大分類）"
             onchange="updJdItem('${i.id}','block',this.value)">
         <input list="jd_subs" value="${esc(i.subdesk)}" placeholder="サブデスク" style="width:100%;margin-top:3px"
             onchange="updJdItem('${i.id}','subdesk',this.value)">
         <input value="${esc(i.legal)}" placeholder="法令の根拠" style="width:100%;margin-top:3px" title="義務的支援①など"
             onchange="updJdItem('${i.id}','legal',this.value)"></td>
       <td><input value="${esc(i.item)}" style="width:100%" onchange="updJdItem('${i.id}','item',this.value)">
-        <input value="${esc(i.standard)}" placeholder="評価内容（〇と言える基準）" style="width:100%;margin-top:3px"
+        <input value="${esc(i.standard)}" placeholder="〇の目安（一人でできる状態）" style="width:100%;margin-top:3px"
           onchange="updJdItem('${i.id}','standard',this.value)">
+        <textarea rows="2" placeholder="具体的な作業内容" style="width:100%;margin-top:3px"
+          onchange="updJdItem('${i.id}','detail',this.value)">${esc(i.detail)}</textarea>
+        <textarea rows="2" placeholder="必要なスキル・知識" style="width:100%;margin-top:3px"
+          onchange="updJdItem('${i.id}','skills',this.value)">${esc(i.skills)}</textarea>
         <input value="${esc(i.note)}" placeholder="注記（直すときの目印）" style="width:100%;margin-top:3px"
           onchange="updJdItem('${i.id}','note',this.value)"></td>
-      <td><input value="${esc(i.metric)}" placeholder="数えるもの" style="width:100%"
+      <td><input value="${esc(i.metric)}" placeholder="実績の確認（何で見るか）" style="width:100%"
             onchange="updJdItem('${i.id}','metric',this.value)">
-        <input value="${esc(i.target)}" placeholder="目安" style="width:100%;margin-top:3px"
-            onchange="updJdItem('${i.id}','target',this.value)"></td>
+        <input value="${esc(i.target)}" placeholder="目安の数字（入れると実績を数字で記録）" style="width:100%;margin-top:3px"
+            onchange="updJdItem('${i.id}','target',this.value)">
+        <input value="${esc(i.systemRef)}" placeholder="システムの画面・機能" style="width:100%;margin-top:3px"
+            onchange="updJdItem('${i.id}','system_ref',this.value)">
+        <input value="${esc(i.frequency)}" placeholder="頻度" style="width:100%;margin-top:3px"
+            onchange="updJdItem('${i.id}','frequency',this.value)"></td>
       <td><select onchange="updJdItem('${i.id}','track',this.value)">
         ${JD_TRACKS.map(t=>`<option ${(i.track||'共通')===t?'selected':''}>${esc(t)}</option>`).join('')}
       </select></td>
@@ -4130,18 +4177,27 @@ async function setJdMetric(itemId, raw){
   }
   render();
 }
-async function setJdMark(itemId, mark){
+/* who='self'＝自己評価（mark）、who='mgr'＝上長評価（mgr_mark・管理者のみ。DBのトリガーでも止めている）。
+   同じ印をもう一度押したら取り消し。両方が空になったら行ごと消す。 */
+async function setJdMark(itemId, mark, who='self'){
+  if(who==='mgr' && !canEdit()) return;
+  const field = who==='mgr'? 'mgr_mark' : 'mark';
+  const prop  = who==='mgr'? 'mgrMark'  : 'mark';
+  const other = who==='mgr'? 'mark'     : 'mgrMark';
   const cur = data.jdChecks.find(x=>x.empId===jdEmpId && x.period===selfingPeriod && x.itemId===itemId);
-  if(cur && cur.mark===mark){                       // 同じ印をもう一度押したら取り消し
+  const val = cur && cur[prop]===mark ? '' : mark;
+  if(cur && !val && !cur[other]){
     await q(sb.from('jd_checks').delete().eq('id', cur.id));
     data.jdChecks = data.jdChecks.filter(x=>x.id!==cur.id);
   } else if(cur){
-    await q(sb.from('jd_checks').update({mark, updated_at:new Date().toISOString()}).eq('id', cur.id));
-    cur.mark = mark;
+    const patch = {updated_at:new Date().toISOString()}; patch[field] = val || null;
+    await q(sb.from('jd_checks').update(patch).eq('id', cur.id));
+    cur[prop] = val;
   } else {
-    const ins = await q(sb.from('jd_checks').insert({employee_id:jdEmpId, period:selfingPeriod,
-      item_id:itemId, mark}).select());
-    if(ins && ins[0]) data.jdChecks.push({id:ins[0].id, empId:jdEmpId, period:selfingPeriod, itemId, mark});
+    const row = {employee_id:jdEmpId, period:selfingPeriod, item_id:itemId}; row[field] = mark;
+    const ins = await q(sb.from('jd_checks').insert(row).select());
+    if(ins && ins[0]) data.jdChecks.push({id:ins[0].id, empId:jdEmpId, period:selfingPeriod, itemId,
+      mark:ins[0].mark||'', mgrMark:ins[0].mgr_mark||''});
   }
   render();
 }
@@ -4150,7 +4206,14 @@ async function addJdItem(){
   /* いま開いている部署の、いちばん下の大分類に足す（すぐ見える場所に出るように） */
   const same = jdItemsAll().filter(i=>(i.dept||'（未分類）')===jdDept);
   const last = same[same.length-1];
-  const ins = await q(sb.from('jd_items').insert({dept:jdDept==='（未分類）'?'':jdDept,
+  /* 番号は「営-41」→「営-42」のように、その部署の最大番号＋1 */
+  let code = '';
+  const mm = last && (last.code||'').match(/^(.*?)(\d+)$/);
+  if(mm){
+    const nmax = Math.max(...same.map(i=>{ const x=(i.code||'').match(/^(.*?)(\d+)$/); return x && x[1]===mm[1]? +x[2] : 0; }));
+    code = mm[1] + String(nmax+1).padStart(mm[2].length,'0');
+  }
+  const ins = await q(sb.from('jd_items').insert({dept:jdDept==='（未分類）'?'':jdDept, code,
     block:last? last.block : 'D', subdesk:last? last.subdesk : '', track:'共通',
     item:'（新しい項目）', flag:'new', active:true, sort_order:max+10}).select());
   if(ins && ins[0]){ await loadAll(); render(); }
@@ -4159,7 +4222,8 @@ async function updJdItem(id, field, value){
   const patch = {}; patch[field] = (field==='skill_id' && !value)? null : value;
   await q(sb.from('jd_items').update(patch).eq('id', id));
   const i = data.jdItems.find(x=>x.id===id); if(!i) return;
-  if(field==='skill_id') i.skillId = value; else if(field==='active') i.active = value; else i[field] = value;
+  if(field==='skill_id') i.skillId = value; else if(field==='system_ref') i.systemRef = value;
+  else if(field==='active') i.active = value; else i[field] = value;
   render();
 }
 async function delJdItem(id){
