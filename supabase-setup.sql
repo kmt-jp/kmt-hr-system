@@ -82,6 +82,21 @@ alter table public.employees add column if not exists affiliation text default '
 alter table public.employees add column if not exists workplace   text default '';
 -- 現住所に住み始めた日（住所変更時の「変更日」）
 alter table public.employees add column if not exists address_since date;
+-- パスポートの発行機関、本人資料（Googleドライブ）のリンク（2026-10-29）
+alter table public.employees add column if not exists passport_issuer   text default '';
+alter table public.employees add column if not exists personal_docs_url text default '';
+
+-- 企業情報（1行だけ持つ表）。閲覧は社員以上、編集は管理者以上（licenses と同じ権限）（2026-10-29）
+-- 法人番号・雇用保険適用事業所番号の値は、画面の「企業情報」から入力する（リポジトリは公開のため、ここには書かない）
+create table if not exists public.company_info (
+  id                 int primary key default 1 check (id = 1),
+  name               text not null default '',
+  corporate_no       text not null default '',
+  emp_ins_office_no  text not null default '',
+  updated_at         timestamptz not null default now(),
+  updated_by         text default ''
+);
+alter table public.company_info enable row level security;
 
 -- 住所変更履歴。住所を変えて保存すると、変更前の住所がここに1行残る。
 -- valid_from＝その住所に住み始めた日（分かる範囲で）、valid_to＝引っ越した日
@@ -411,6 +426,14 @@ $$;
 -- 未ログイン(anon)からRPCで呼べないようにし、ログイン済みにだけ許可する
 revoke all on function public.my_role() from public, anon;
 revoke all on function public.my_rank() from public, anon;
+
+-- 企業情報の権限（my_rank() の後に作る。2026-10-29）
+drop policy if exists kmt_company_select on public.company_info;
+drop policy if exists kmt_company_insert on public.company_info;
+drop policy if exists kmt_company_update on public.company_info;
+create policy kmt_company_select on public.company_info for select to authenticated using (my_rank() >= 1);
+create policy kmt_company_insert on public.company_info for insert to authenticated with check (my_rank() >= 2);
+create policy kmt_company_update on public.company_info for update to authenticated using (my_rank() >= 2) with check (my_rank() >= 2);
 grant execute on function public.my_role() to authenticated;
 grant execute on function public.my_rank() to authenticated;
 

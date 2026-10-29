@@ -502,6 +502,7 @@ const WRITE_RANK = {allowed_users:3, departments:2, doc_templates:2, employees:2
   announcements:2,        // お知らせの投稿・削除は管理者以上
   announcement_reads:1,   // 「確認しました」は本人（社員以上）が記録する
   licenses:2,             // 会社の許可証は管理者以上のみ編集
+  company_info:2,         // 企業情報（法人番号など）も管理者以上のみ編集
   monthly_reports:2, team_targets:2, case_records:2,   // 月報の入力も管理者以上
   app_updates:2, app_update_reads:1,                   // 「確認しました」は本人が記録する
   role_master:2,
@@ -580,7 +581,7 @@ const KPI_LIBRARY = [
 ];
 
 /* ---------------- state ---------------- */
-let data = {departments:[], employees:[], evaluations:[], kpis:[], assets:[], docTemplates:[], allowedUsers:[], skillDefs:[], empSkills:{}, announcements:[], annReads:[], licenses:[], monthlyReports:[], teamTargets:[], caseRecords:[], appUpdates:[], updReads:[],
+let data = {company:{name:'株式会社KMT', corporateNo:'', empInsOfficeNo:''}, departments:[], employees:[], evaluations:[], kpis:[], assets:[], docTemplates:[], allowedUsers:[], skillDefs:[], empSkills:{}, announcements:[], annReads:[], licenses:[], monthlyReports:[], teamTargets:[], caseRecords:[], appUpdates:[], updReads:[],
 roleMaster:[], selfingReports:[], selfingRoles:[], roleSkillTargets:[], mandalaCharts:[],
 jdItems:[], jdChecks:[], jdAssignments:[], jdMetrics:[],
 wfQuestions:[], wfResponses:[], wfTopics:[], wfTasks:[], wfIdeas:[], addrHistory:[]};
@@ -691,7 +692,8 @@ function dbToEmp(r){ return {
   emergencyName:r.emergency_name, emergencyRelation:r.emergency_relation, emergencyPhone:r.emergency_phone,
   socialIns:r.social_ins, empInsNo:r.emp_ins_no, pensionNo:r.pension_no, myNumberCollected:r.my_number_collected,
   zairyuStatus:r.zairyu_status, zairyuCardNo:r.zairyu_card_no, zairyuExpiry:r.zairyu_expiry||'',
-  passportNo:r.passport_no, passportExpiry:r.passport_expiry||'', toritsugiExpiry:r.toritsugi_expiry||'', notes:r.notes, docs:{}
+  passportNo:r.passport_no, passportExpiry:r.passport_expiry||'', passportIssuer:r.passport_issuer||'',
+  toritsugiExpiry:r.toritsugi_expiry||'', personalDocsUrl:r.personal_docs_url||'', notes:r.notes, docs:{}
 };}
 function empToDb(e){ return {
   id:e.id, emp_no:e.empNo||'', status:e.status, name_kanji:e.nameKanji||'', name_kana:e.nameKana||'', name_roma:e.nameRoma||'',
@@ -703,7 +705,8 @@ function empToDb(e){ return {
   emergency_name:e.emergencyName||'', emergency_relation:e.emergencyRelation||'', emergency_phone:e.emergencyPhone||'',
   social_ins:!!e.socialIns, emp_ins_no:e.empInsNo||'', pension_no:e.pensionNo||'', my_number_collected:!!e.myNumberCollected,
   zairyu_status:e.zairyuStatus||'', zairyu_card_no:e.zairyuCardNo||'', zairyu_expiry:dOrNull(e.zairyuExpiry),
-  passport_no:e.passportNo||'', passport_expiry:dOrNull(e.passportExpiry), toritsugi_expiry:dOrNull(e.toritsugiExpiry), notes:e.notes||''
+  passport_no:e.passportNo||'', passport_expiry:dOrNull(e.passportExpiry), passport_issuer:e.passportIssuer||'',
+  toritsugi_expiry:dOrNull(e.toritsugiExpiry), personal_docs_url:e.personalDocsUrl||'', notes:e.notes||''
 };}
 function dbToEval(r){ return {id:r.id, empId:r.employee_id, period:r.period, evaluator:r.evaluator, status:r.status,
   role:r.role||'紹介営業', kpis:r.kpis||[], comps:r.comps||[], atts:r.atts||[],
@@ -795,6 +798,11 @@ async function loadAll(){
   data.announcements = anns;
   data.annReads = reads;
   data.licenses = (lics||[]).map(dbToLic);
+  /* 企業情報（1行だけの表）。読めなくても他の画面は動かす */
+  try{
+    const {data:ci} = await sb.from('company_info').select('*').eq('id',1).maybeSingle();
+    if(ci) data.company = {name:ci.name||'', corporateNo:ci.corporate_no||'', empInsOfficeNo:ci.emp_ins_office_no||'', updatedAt:ci.updated_at, updatedBy:ci.updated_by||''};
+  }catch(err){}
   data.skillDefs = skdefs;
   data.empSkills = {};
   esk.forEach(r=>{
@@ -1163,6 +1171,7 @@ async function reloadData(){
 /* ================= RENDER ================= */
 /* [キー, 表示名, 必要な最低ランク] */
 const NAV = [
+  ['company','企業情報',1],
   ['dashboard','ダッシュボード',0],
   ['talent','タレント',1],
   ['employees','従業員・人事情報',1],
@@ -1381,7 +1390,7 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20261012.52';
+const APP_VER = 'ver.20261029.53';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
   {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
@@ -1449,6 +1458,8 @@ function renderNav(){
     </div>`:''}
     ${myRank()>=1? annCardHtml() : ''}
     <div class="sb-single">
+      ${navAllowed('company')? `<button class="sb-item ${view==='company'?'active':''}" onclick="go('company')">
+        <span class="ic">🏢</span>企業情報</button>`:''}
       <button class="sb-item ${view==='dashboard'?'active':''}" onclick="go('dashboard')">
         <span class="ic">🏠</span>ダッシュボード</button>
     </div>
@@ -1484,6 +1495,7 @@ function render(){
   if(view==='dashboard') m.innerHTML = viewDashboard();
   else if(view==='talent') m.innerHTML = viewTalent();
   else if(view==='skills') m.innerHTML = viewSkills();
+  else if(view==='company') m.innerHTML = viewCompany();
   else if(view==='licenses') m.innerHTML = viewLicenses();
   else if(view==='welfare')  m.innerHTML = viewWelfare();
   else if(view==='geppo') m.innerHTML = viewGeppo();
@@ -4536,6 +4548,85 @@ function licToDb(l){ return {id:l.id, name:l.name, authority:l.authority||'', li
   docs:l.docs||[], ref_url:l.refUrl||'', drive_url:l.driveUrl||'', notes:l.notes||'',
   sort_order:l.sortOrder||0}; }
 
+/* ===== 企業情報：法人番号・雇用保険適用事業所番号・登録支援機関／職業紹介の番号と有効期限 =====
+   許可・登録の番号と有効期限は「許可証管理」と同じデータを表示する（二重入力を避けるため）。 */
+function copyText(s){
+  const done = ()=>toast('コピーしました：'+s);
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(s).then(done, ()=>toast('コピーできませんでした', true)); }
+  else toast('コピーできませんでした', true);
+}
+function viewCompany(){
+  if(myRank()<1) return '<div class="panel"><h2>閲覧権限がありません</h2></div>';
+  const c = data.company||{};
+  const row = (k,v,copy)=>`<dt>${k}</dt><dd>${v? `<b>${esc(v)}</b>${copy? ` <button class="btn small ghost" onclick="copyText('${esc(v)}')">コピー</button>`:''}` : '<span class="muted">未入力</span>'}</dd>`;
+  const lics = (data.licenses||[]).slice().sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));
+  const licRow = l=>{
+    const dTo = daysUntil(l.validTo);
+    let badge = '<span class="badge b-gray">期限未入力</span>';
+    if(l.validTo){
+      if(l.status==='失効' || (dTo!==null && dTo<0)) badge = '<span class="badge b-red">失効</span>';
+      else if(dTo!==null && dTo<=90) badge = `<span class="badge b-red">あと${dTo}日</span>`;
+      else if(dTo!==null && dTo<=210) badge = `<span class="badge b-yellow">あと${dTo}日（更新準備）</span>`;
+      else badge = `<span class="badge b-green">有効（あと${dTo}日）</span>`;
+    }
+    return `<tr>
+      <td>${esc(l.name)}</td>
+      <td>${l.licenseNo? `<b>${esc(l.licenseNo)}</b> <button class="btn small ghost" onclick="copyText('${esc(l.licenseNo)}')">コピー</button>` : '<span class="muted">未入力</span>'}</td>
+      <td>${l.validFrom||l.validTo? `${fmtDate(l.validFrom)} 〜 <b>${fmtDate(l.validTo)}</b>` : '—'}</td>
+      <td>${badge}</td></tr>`;
+  };
+  return `
+  <div class="panel">
+    <h2>企業情報 <span class="en">Company Profile — 法人番号・事業所番号・許可／登録の番号と有効期限</span></h2>
+    <div class="fieldset" style="margin-top:14px">
+      <legend>法人情報</legend>
+      <div class="toolbar">
+        <span class="muted">${c.updatedAt? '最終更新 '+esc(String(c.updatedAt).slice(0,10))+(c.updatedBy?'（'+esc(c.updatedBy)+'）':'') : ''}</span>
+        <div class="spacer"></div>
+        ${canEdit()? '<button class="btn" onclick="openCompanyForm()">編集</button>':'<span class="muted">閲覧のみ</span>'}
+      </div>
+      <dl class="kv">
+        ${row('法人名', c.name, false)}
+        ${row('法人番号', c.corporateNo, true)}
+        ${row('雇用保険適用事業所番号', c.empInsOfficeNo, true)}
+      </dl>
+    </div>
+    <div class="fieldset" style="margin-top:14px">
+      <legend>登録・許可（登録支援機関・職業紹介）</legend>
+      <div class="tw"><table>
+        <thead><tr><th>名称</th><th>登録番号・許可番号</th><th>有効期間</th><th>状態</th></tr></thead>
+        <tbody>${lics.map(licRow).join('') || '<tr><td colspan="4" class="muted">登録されていません</td></tr>'}</tbody>
+      </table></div>
+      <div class="muted" style="margin-top:8px">番号と有効期限の入力・更新時期の確認・必要書類は
+        <a href="javascript:go('licenses')">🏛 許可証管理</a> で行います（ここには同じデータが表示されます）。</div>
+    </div>
+  </div>`;
+}
+function openCompanyForm(){
+  if(!canEdit()){ toast('編集できるのは管理者以上です', true); return; }
+  const c = data.company||{};
+  modal(`
+  <h3>企業情報を編集</h3>
+  <div class="formgrid">
+    <div><label>法人名</label><input id="co_name" value="${esc(c.name)}"></div>
+    <div><label>法人番号（13桁）</label><input id="co_corp" value="${esc(c.corporateNo)}" inputmode="numeric"></div>
+    <div><label>雇用保険適用事業所番号</label><input id="co_ins" value="${esc(c.empInsOfficeNo)}" inputmode="numeric"></div>
+  </div>
+  <div class="modal-actions">
+    <button class="btn ghost" onclick="closeModal()">キャンセル</button>
+    <button class="btn" onclick="saveCompany()">保存</button>
+  </div>`);
+}
+async function saveCompany(){
+  const g = i=>document.getElementById(i).value.trim();
+  const corp = g('co_corp').replace(/[\s-]/g,''), ins = g('co_ins').replace(/[\s-]/g,'');
+  if(corp && !/^\d{13}$/.test(corp)){ alert('法人番号は13桁の数字で入力してください'); return; }
+  const row = {id:1, name:g('co_name'), corporate_no:corp, emp_ins_office_no:ins, updated_at:new Date().toISOString(), updated_by:myEmail()};
+  await q(sb.from('company_info').upsert(row));
+  data.company = {name:row.name, corporateNo:corp, empInsOfficeNo:ins, updatedAt:row.updated_at, updatedBy:row.updated_by};
+  closeModal(); toast('企業情報を保存しました'); render();
+}
+
 function viewLicenses(){
   if(myRank()<1) return '<div class="panel"><h2>閲覧権限がありません</h2></div>';
   const list = (data.licenses||[]).slice().sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0));
@@ -4966,7 +5057,12 @@ function viewEmpDetail(id){
           <dt>在留期限</dt><dd>${fmtDate(e.zairyuExpiry)} ${zd!==null&&zd<=90?`<span class="badge ${zd<=30?'b-red':'b-yellow'}">あと${zd}日</span>`:''}</dd>
           <dt>パスポート番号</dt><dd>${esc(e.passportNo||'—')}</dd>
           <dt>パスポート期限</dt><dd>${fmtDate(e.passportExpiry)}</dd>
+          <dt>パスポート発行機関</dt><dd>${esc(e.passportIssuer||'—')}</dd>
         </dl>`:''}
+        <div class="section-title">本人資料</div>
+        <div style="margin-bottom:10px">${/^https?:\/\//i.test(e.personalDocsUrl||'')
+          ? `<a class="btn small secondary" href="${esc(e.personalDocsUrl)}" target="_blank" rel="noopener">📁 本人資料を開く（Googleドライブ）</a>`
+          : '<span class="muted">リンク未設定（編集画面の「8. 本人資料」に入力）</span>'}</div>
         <div class="section-title">メモ</div>
         <div style="white-space:pre-wrap;font-size:13px">${esc(e.notes||'—')}</div>
       </div>
@@ -5055,8 +5151,8 @@ function openEmpForm(id){
     hireDate:'', probationEnd:'', contractEnd:'', resignDate:'',
     email:'', phone:'', postalCode:'', address:'', addressSince:'', emergencyName:'', emergencyRelation:'', emergencyPhone:'',
     socialIns:true, empInsNo:'', pensionNo:'', myNumberCollected:false,
-    zairyuStatus:'', zairyuCardNo:'', zairyuExpiry:'', passportNo:'', passportExpiry:'', toritsugiExpiry:'',
-    notes:'', docs:{}
+    zairyuStatus:'', zairyuCardNo:'', zairyuExpiry:'', passportNo:'', passportExpiry:'', passportIssuer:'', toritsugiExpiry:'',
+    personalDocsUrl:'', notes:'', docs:{}
   };
   const isNew = !id;
   modal(`
@@ -5116,9 +5212,15 @@ function openEmpForm(id){
     <div><label>7-3 在留期限</label><input type="date" id="f_zExp" value="${esc(e.zairyuExpiry)}"></div>
     <div><label>7-4 パスポート番号</label><input id="f_pNo" value="${esc(e.passportNo)}"></div>
     <div><label>7-5 パスポート期限</label><input type="date" id="f_pExp" value="${esc(e.passportExpiry)}"></div>
-    <div><label>7-6 取次者証期限（申請等取次者証明書）</label><input type="date" id="f_tori" value="${esc(e.toritsugiExpiry)}"></div>
+    <div><label>7-6 パスポート発行機関</label><input id="f_pIssuer" value="${esc(e.passportIssuer)}" placeholder="例：Cục Quản lý xuất nhập cảnh／外務省／Ministry of Foreign Affairs"></div>
+    <div><label>7-7 取次者証期限（申請等取次者証明書）</label><input type="date" id="f_tori" value="${esc(e.toritsugiExpiry)}"></div>
   </div></div>
-  <div class="fieldset"><legend>8. メモ</legend>
+  <div class="fieldset"><legend>8. 本人資料（Googleドライブ）</legend>
+    <label>本人資料フォルダのリンク</label>
+    <input id="f_docsUrl" value="${esc(e.personalDocsUrl)}" placeholder="https://drive.google.com/…" style="width:100%">
+    <div class="muted" style="margin-top:2px">※パスポート・在留カードのコピーなどを入れたフォルダのリンク。閲覧できる人はGoogleドライブ側の共有設定で決まります。</div>
+  </div>
+  <div class="fieldset"><legend>9. メモ</legend>
     <textarea id="f_notes" rows="3" style="width:100%">${esc(e.notes)}</textarea>
   </div>
   <div class="modal-actions">
@@ -5155,9 +5257,11 @@ async function saveEmp(id, isNew){
     socialIns:g('f_socIns')==='1', empInsNo:g('f_empIns'), pensionNo:g('f_pension'),
     myNumberCollected:g('f_myNum')==='1',
     zairyuStatus:document.getElementById('f_zStatus').value, zairyuCardNo:g('f_zCard'), zairyuExpiry:g('f_zExp'),
-    passportNo:g('f_pNo'), passportExpiry:g('f_pExp'), toritsugiExpiry:g('f_tori'), notes:g('f_notes')
+    passportNo:g('f_pNo'), passportExpiry:g('f_pExp'), passportIssuer:g('f_pIssuer'),
+    toritsugiExpiry:g('f_tori'), personalDocsUrl:g('f_docsUrl'), notes:g('f_notes')
   });
   if(!e.nameKanji && !e.nameRoma){ alert('氏名（漢字またはローマ字）を入力してください'); return; }
+  if(e.personalDocsUrl && !/^https?:\/\//i.test(e.personalDocsUrl)){ alert('本人資料のリンクは「https://」で始まるURLを入力してください'); return; }
   await q(sb.from('employees').upsert(empToDb(e)));
   if(isNew) data.employees.push(e);
   if(moved){
