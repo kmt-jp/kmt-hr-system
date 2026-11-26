@@ -245,6 +245,132 @@ button.btn.ghost{background:#fff;color:var(--sub);border:1px solid var(--border)
 .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13px}
 .kv dt{color:var(--sub);white-space:nowrap}
 .kv dd{font-weight:600}
+
+/* ===== 人事評価（新制度 2026）。評価管理タブの中だけに効く（.hy の中） ===== */
+.hy{--bg:#f3f5f9;--panel:#ffffff;--fg:#1a2332;--sub:#5b687c;--line:#dce2eb;--soft:#eef4f6;
+  --accent:#0b7a84;--accent-ink:#ffffff;--accent-soft:#e0f1f3;
+  --ok:#15803d;--ok-soft:#e2f3e7;--warn:#b45309;--warn-soft:#fcefd9;--bad:#b91c1c;--bad-soft:#fae4e4;--s:#6d28d9;--s-soft:#eee6fc;
+  --body:inherit;--mono:ui-monospace,Consolas,"Noto Sans JP",monospace;
+  color:var(--fg);font-size:14px;line-height:1.65}
+.hy-top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.hy-title{font-size:18px;margin-right:6px}
+.hy-main{display:grid;gap:18px;min-width:0}
+.hy th{border-bottom:1px solid var(--line)}
+.hy .btn{box-shadow:none;font-weight:500}
+.hy .kv dd{font-weight:400}
+.hy *{box-sizing:border-box}
+.hy .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:8px}
+.hy .card{background:var(--soft);border-radius:8px;padding:10px 12px;min-width:0}
+.hy .card span{display:block;font-size:11.5px;color:var(--sub);font-weight:700}
+.hy .card b{font-family:var(--mono);font-size:19px;font-variant-numeric:tabular-nums}
+.hy .card small{display:block;font-size:11.5px;color:var(--sub)}
+.hy tr.total td{font-weight:700;border-top:2px solid var(--line)}
+.hy input[type=text]{font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--fg);min-width:0}
+.hy .addrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.hy .hpanel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0}
+.hy h1{font-size:20px;margin:0;text-wrap:balance}
+.hy h2{font-size:15.5px;margin:0 0 10px;text-wrap:balance}
+.hy h3{font-size:13.5px;margin:14px 0 6px;color:var(--sub);font-weight:700;letter-spacing:.03em}
+.hy .head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.hy .muted{color:var(--sub);font-size:12.5px}
+.hy .btn{font:inherit;font-size:13px;padding:6px 12px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+.hy .btn:hover{border-color:var(--accent)}
+.hy .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.hy button:focus-visible,.hy select:focus-visible,.hy input:focus-visible,.hy textarea:focus-visible,.hy tr:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hy .flow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:6px}
+.hy .step{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--soft);min-width:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.hy .step:hover{border-color:var(--accent)}
+.hy .flowdetail{margin-top:10px;border:1px solid var(--accent);border-radius:8px;padding:10px 14px;background:var(--panel);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.hy .flowdetail p{margin:2px 0 0;font-size:13px}
+.hy .step b{display:block;font-size:12.5px}
+.hy .step span{font-size:11.5px;color:var(--sub);font-family:var(--mono)}
+.hy .step.done{background:var(--ok-soft);border-color:transparent}
+.hy .step.done b::before{content:"✓ ";color:var(--ok)}
+.hy .step.now{background:var(--accent-soft);border-color:var(--accent)}
+@media (max-width:900px){.hy .flow{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){.hy .flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.hy .tw{overflow-x:auto}
+.hy table{border-collapse:collapse;width:100%;font-size:13px}
+.hy th,.hy td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.hy th{font-size:11.5px;color:var(--sub);font-weight:700;background:var(--soft);white-space:nowrap}
+.hy td.n,.hy th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hy #list tbody tr{cursor:pointer}
+.hy #list tbody tr:hover{background:var(--soft)}
+.hy #list tbody tr.sel{background:var(--accent-soft)}
+.hy .name{font-weight:700}
+.hy .pill{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.hy .p-ok{background:var(--ok-soft);color:var(--ok)}
+.hy .p-warn{background:var(--warn-soft);color:var(--warn)}
+.hy .p-bad{background:var(--bad-soft);color:var(--bad)}
+.hy .p-acc{background:var(--accent-soft);color:var(--accent)}
+.hy .p-soft{background:var(--soft);color:var(--sub)}
+.hy .rank{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:7px;font-weight:700;font-family:var(--mono);font-size:15px}
+.hy .r-S{background:var(--s-soft);color:var(--s)}
+.hy .r-A{background:var(--ok-soft);color:var(--ok)}
+.hy .r-B{background:var(--accent-soft);color:var(--accent)}
+.hy .r-C{background:var(--warn-soft);color:var(--warn)}
+.hy .r-D{background:var(--bad-soft);color:var(--bad)}
+.hy .tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin:12px 0 4px}
+.hy .tab{font:inherit;font-size:13px;padding:8px 14px;border:0;border-bottom:2px solid transparent;background:none;color:var(--sub);cursor:pointer;font-weight:700}
+.hy .tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.hy .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.hy .box{border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.hy .box-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.hy .box-h b{font-size:14px}
+.hy .score{font-family:var(--mono);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums}
+.hy .score small{font-size:12px;color:var(--sub);font-weight:500}
+.hy .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;align-items:center;margin-top:8px}
+.hy .kv dt{color:var(--sub)}
+.hy .kv dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.hy input[type=number]{font:inherit;font-family:var(--mono);width:72px;padding:3px 6px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--fg);text-align:right}
+.hy input[type=number]:disabled,.hy select:disabled,.hy textarea:disabled{background:var(--soft);color:var(--sub)}
+.hy select.sc{font:inherit;font-family:var(--mono);padding:3px 6px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--fg)}
+.hy textarea{font:inherit;width:100%;min-height:84px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--fg);resize:vertical}
+.hy .mix{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:6px 0 2px}
+.hy .mix label{display:flex;gap:6px;align-items:center;font-size:13px}
+.hy .note{font-size:12px;color:var(--sub);margin:6px 0 0}
+.hy .warnline{font-size:12.5px;color:var(--warn);background:var(--warn-soft);border-radius:6px;padding:6px 10px;margin-top:8px}
+.hy .new{font-size:10.5px;font-weight:700;color:var(--warn);margin-left:4px}
+.hy .diff-up{color:var(--ok);font-family:var(--mono)}
+.hy .diff-down{color:var(--bad);font-family:var(--mono)}
+.hy .prog{height:8px;border-radius:4px;background:var(--soft);overflow:hidden;min-width:80px}
+.hy .prog i{display:block;height:100%;background:var(--accent)}
+.hy .lock{text-align:center;padding:48px 16px}
+.hy .lock b{display:block;font-size:17px;margin-bottom:6px}
+.hy .formula{font-family:var(--mono);font-size:12.5px;background:var(--soft);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+.hy .hbar{display:grid;grid-template-columns:minmax(90px,150px) 1fr auto;gap:4px 10px;align-items:center;font-size:13px;margin-top:8px}
+.hy .hbar .trk{height:14px;border-radius:7px;background:var(--soft);overflow:hidden;position:relative}
+.hy .hbar .trk i{display:block;height:100%;border-radius:7px}
+.hy .hbar .val{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12.5px;white-space:nowrap}
+.hy .hbar .sub{color:var(--sub);font-size:12px}
+.hy .stack{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--soft);margin-top:8px}
+.hy .stack i{display:block;height:100%}
+.hy .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--sub);margin-top:6px}
+.hy .legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:var(--c);vertical-align:-1px}
+.hy .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.hy .seg button{font:inherit;font-size:12.5px;padding:5px 12px;border:0;background:var(--panel);color:var(--sub);cursor:pointer}
+.hy .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.hy svg.radar{width:100%;max-width:640px;height:auto;display:block;margin:0 auto}
+.hy svg.radar .ring{fill:none;stroke:var(--line);stroke-width:1}
+.hy svg.radar .ring.m{stroke:var(--sub);stroke-dasharray:3 3}
+.hy svg.radar .axis{stroke:var(--line);stroke-width:1}
+.hy svg.radar text{fill:var(--fg);font-size:11px;font-family:var(--body)}
+.hy svg.radar text.tick{fill:var(--sub);font-size:9.5px;font-family:var(--mono)}
+.hy td.item{min-width:240px;max-width:520px}
+.hy td.ep{min-width:220px;width:30%}
+.hy textarea.sm{min-height:58px;font-size:12.5px;padding:6px 8px}
+.hy .epread{font-size:12.5px;white-space:pre-wrap;color:var(--fg)}
+.hy .pubchk{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--sub);margin-top:4px}
+.hy .ino{font-family:var(--mono);color:var(--accent);font-weight:600;margin-right:6px}
+.hy .iname{font-weight:500}
+.hy .idesc{font-size:12px;color:var(--sub);margin-top:2px;line-height:1.55}
+.hy details{margin-top:3px}
+.hy details summary{font-size:11.5px;color:var(--accent);cursor:pointer;width:max-content}
+.hy .lv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12px;margin:6px 0 2px;padding:8px 10px;background:var(--soft);border-radius:6px}
+.hy .lv dt{font-family:var(--mono);font-weight:600;color:var(--sub)}
+.hy .lv dd{margin:0}
+.hy .chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-top:8px}
+@media (prefers-reduced-motion:no-preference){.hy .prog i{transition:width .3s}}
 /* ===== タレント（カオナビ型 顔写真一覧）===== */
 .talent-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(var(--card-w,150px),1fr))}
 .tcard{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:box-shadow .15s, transform .15s}
@@ -693,7 +819,8 @@ function dbToEmp(r){ return {
   socialIns:r.social_ins, empInsNo:r.emp_ins_no, pensionNo:r.pension_no, myNumberCollected:r.my_number_collected,
   zairyuStatus:r.zairyu_status, zairyuCardNo:r.zairyu_card_no, zairyuExpiry:r.zairyu_expiry||'',
   passportNo:r.passport_no, passportExpiry:r.passport_expiry||'', passportIssuer:r.passport_issuer||'',
-  toritsugiExpiry:r.toritsugi_expiry||'', personalDocsUrl:r.personal_docs_url||'', notes:r.notes, docs:{}
+  toritsugiExpiry:r.toritsugi_expiry||'', personalDocsUrl:r.personal_docs_url||'', notes:r.notes, docs:{},
+  evalTarget:!!r.eval_target, grade:r.grade||'', evalLead:r.eval_lead||''
 };}
 function empToDb(e){ return {
   id:e.id, emp_no:e.empNo||'', status:e.status, name_kanji:e.nameKanji||'', name_kana:e.nameKana||'', name_roma:e.nameRoma||'',
@@ -706,16 +833,17 @@ function empToDb(e){ return {
   social_ins:!!e.socialIns, emp_ins_no:e.empInsNo||'', pension_no:e.pensionNo||'', my_number_collected:!!e.myNumberCollected,
   zairyu_status:e.zairyuStatus||'', zairyu_card_no:e.zairyuCardNo||'', zairyu_expiry:dOrNull(e.zairyuExpiry),
   passport_no:e.passportNo||'', passport_expiry:dOrNull(e.passportExpiry), passport_issuer:e.passportIssuer||'',
-  toritsugi_expiry:dOrNull(e.toritsugiExpiry), personal_docs_url:e.personalDocsUrl||'', notes:e.notes||''
+  toritsugi_expiry:dOrNull(e.toritsugiExpiry), personal_docs_url:e.personalDocsUrl||'', notes:e.notes||'',
+  eval_target:!!e.evalTarget, grade:e.grade||'', eval_lead:e.evalLead||''
 };}
 function dbToEval(r){ return {id:r.id, empId:r.employee_id, period:r.period, evaluator:r.evaluator, status:r.status,
   role:r.role||'紹介営業', kpis:r.kpis||[], comps:r.comps||[], atts:r.atts||[],
   sdReason:r.sd_reason||'', midReview:r.mid_review||'', finalMeeting:r.final_meeting||'', empComment:r.emp_comment||'',
-  goals:r.goals||[], selfScore:r.self_score, mgrScore:r.mgr_score, finalGrade:r.final_grade, comment:r.comment}; }
+  goals:r.goals||[], selfScore:r.self_score, mgrScore:r.mgr_score, finalGrade:r.final_grade, comment:r.comment, sheet:r.sheet||null}; }
 function evalToDb(v){ return {id:v.id, employee_id:v.empId, period:v.period||'', evaluator:v.evaluator||'', status:v.status,
   role:v.role||'紹介営業', kpis:v.kpis||[], comps:v.comps||[], atts:v.atts||[],
   sd_reason:v.sdReason||'', mid_review:v.midReview||'', final_meeting:v.finalMeeting||'', emp_comment:v.empComment||'',
-  goals:v.goals||[], self_score:v.selfScore||'', mgr_score:v.mgrScore||'', final_grade:v.finalGrade||'', comment:v.comment||''}; }
+  goals:v.goals||[], self_score:v.selfScore||'', mgr_score:v.mgrScore||'', final_grade:v.finalGrade||'', comment:v.comment||'', sheet:v.sheet||{}}; }
 function dbToKpi(r){ return {id:r.id, period:r.period, scope:r.scope, empId:r.employee_id||'', dept:r.dept, name:r.name, unit:r.unit, target:r.target, records:r.records||[], notes:r.notes, lowerBetter:!!r.lower_better}; }
 function kpiToDb(k){ return {id:k.id, period:k.period||'', scope:k.scope, employee_id:dOrNull(k.empId), dept:k.dept||'', name:k.name, unit:k.unit||'', target:k.target||'', records:k.records||[], notes:k.notes||'', lower_better:!!k.lowerBetter}; }
 function dbToAsset(r){ return {id:r.id, assetNo:r.asset_no, category:r.category, name:r.name, serial:r.serial, purchaseDate:r.purchase_date||'', price:r.price, status:r.status, assignedTo:r.assigned_to||'', lendDate:r.lend_date||'', returnDate:r.return_date||'', notes:r.notes}; }
@@ -1390,7 +1518,7 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20261029.53';
+const APP_VER = 'ver.20261126.54';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
   {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
@@ -5351,6 +5479,9 @@ function evalKpiCalc(k){
   return {rate, auto, score: isNaN(adj)? auto : adj};
 }
 function evalCalc(v){
+  /* 新しい形（等級×成果×行動）のシートは、Hyoka の計算を使う */
+  if(v && v.sheet && v.sheet.v===2){ const r = Hyoka.calc(v); if(r){ const rd = x=>x==null? null : Math.round(x*100)/100;
+    return {wts:{a:0,b:0,c:0}, aSub:rd(r.seika), bSub:rd(r.koudou), cSub:null, total:rd(r.total), rank:r.rank==='—'?'':r.rank, coef:'', band:''}; } }
   const wts = EVAL_ROLES[v.role] || EVAL_ROLES['紹介営業'];
   let wsum=0, ssum=0;
   (v.kpis||[]).forEach(k=>{
@@ -5378,6 +5509,9 @@ function newEvalObj(empId, period){
     goals:[], selfScore:'', mgrScore:'', finalGrade:'', comment:''};
 }
 function viewEvals(){
+  /* 新制度（等級×成果×行動）の画面は Hyoka が描く。この下の旧シート（A×B×C）は使っていない */
+  setTimeout(()=>{ const el=document.getElementById('hyRoot'); if(el) Hyoka.mount(el); }, 0);
+  return '<div class="panel"><div id="hyRoot" class="hy"></div></div>';
   const visible = myRank()>=2 ? data.evaluations : data.evaluations.filter(v=>canSeeEmp(v.empId));
   const periods = [...new Set(visible.map(v=>v.period))].sort().reverse();
   let list = visible.slice();
@@ -6571,6 +6705,609 @@ sb.auth.onAuthStateChange((event, s)=>{
   // 再設定リンクの処理が boot() より遅れて終わった場合の保険
   if(event==='PASSWORD_RECOVERY'){ showNewPassword(); }
 });
+/* ================= 人事評価（新制度 2026）：評価管理タブの中身 =================
+   等級 × 成果 × 行動。対象者・等級・評価者は employees、シートの中身は evaluations.sheet（v:2）。
+   インセンティブの計算は、ここにはまだ入れていない。 */
+const Hyoka=(function(){
+const BEHAVIOR=[
+  {g:'仕事の進め方',items:['報連相','正確性・期限','スピード・優先順位','タスク管理・確認']},
+  {g:'人への対応',items:['企業への対応','人材への対応','チーム貢献']},
+  {g:'規律・自己管理',items:['誠実さ・規律','勤怠・自己管理','届出：出張・経費']},
+  {g:'成長・改善',items:['改善・工夫','提案・発言','挑戦・学習']}
+];
+const NEW=new Set(['タスク管理・確認','勤怠・自己管理','届出：出張・経費','提案・発言']);
+const EXTRA={'3':['チーム管理','育成'],'4M':['チーム管理','育成','複数チーム管理、判断と評価'],'4S':['分野の責任'],'5':['方針と全体']};
+const RATIO={'5':.8,'4M':.7,'4S':.7,'3':.6,'2':.5,'1':.3,'L':.5,'P':0};
+const gl=m=>m.grade==='L'?'現地スタッフ':m.grade==='P'?'アルバイト':'等級'+m.grade;
+const STD={newJob:.20,oldJob:.40,newDec:.30,oldDec:.35,decided:6};
+const RATE_LABEL={newJob:'求人の獲得率（新規企業）',oldJob:'求人の獲得率（既存企業）',newDec:'決定の獲得率（新規企業）',oldDec:'決定の獲得率（既存企業）'};
+/* [説明, 5点, 4点, 3点, 2点, 1点] */
+const DESC={
+ '報連相':['決まったこと・問題・進み具合を、必要な人に、早めに、正しく伝える',
+   '言われる前に共有し、悪い知らせほど早く相談する。周りが動きやすい伝え方をする',
+   '言われる前に報告・相談できる。伝える内容もまとまっている',
+   '必要なことを、期限までに報告・連絡・相談できる',
+   'ときどき報告が遅れる、または必要な人に伝わっていないことがある',
+   '報告がない、遅い、聞かれるまで言わないことが多い'],
+ '正確性・期限':['書類・入力・申請を、間違いなく、期限までに終える',
+   'ミスがほとんどなく、期限より前に終える。自分で見直しの仕組みを作っている',
+   'ミスが少なく、期限より前に終えることが多い',
+   'ミスはまれで、期限を守る',
+   'ときどきミスや期限ぎりぎり・遅れがあり、直しが必要になる',
+   'ミスや期限切れを繰り返し、やり直しが多い'],
+ 'スピード・優先順位':['急ぐもの・大事なものから手を付け、早く動く',
+   '急ぎと大事を見分けてすぐに動く。周りの仕事の順番も考えられる',
+   '急ぎの仕事にすぐ取りかかり、決められた時間より早く終えることが多い',
+   '優先順位をつけて、決められた時間内に終える',
+   'ときどき順番を間違えたり、急ぎの仕事が遅れたりする',
+   '後回しが多く、急ぎの仕事が遅れる'],
+ 'タスク管理・確認':['頼まれたことを自分で管理し、社内の共有事項を確認して実行する',
+   '頼まれたことを自分で管理し、抜けがない。遅れそうなら前もって相談',
+   '頼まれたことを忘れず、催促なしで終える。社内共有も自分から確認している',
+   '頼まれたことを忘れず対応し、遅れるときは報告する。社内共有を確認して実行',
+   'ときどき頼まれたことを忘れたり、共有事項を見落としたりして、催促が必要になる',
+   '頼まれたことを忘れる。遅れても報告がない。失念のミスを繰り返す'],
+ '企業への対応':['企業の担当者との連絡、要望やトラブルへの対応、信頼関係づくり',
+   '企業から信頼され、要望の先回りや改善の提案ができる',
+   '企業の要望に早く丁寧に応え、企業から名前を挙げて頼られることがある',
+   '連絡・対応が丁寧で早く、約束を守る',
+   'ときどき返信が遅れたり、確認不足で企業に手間をかけたりする',
+   '返信が遅い、約束を忘れるなどで、企業から苦情が出る'],
+ '人材への対応':['外国人材の相談への対応、生活・仕事の支援、義務的支援を行う',
+   '人材から頼られ、問題が大きくなる前に気づいて動ける',
+   '相談に早く丁寧に応え、人材の状況の変化にも気づける',
+   '相談に早く丁寧に応え、義務的支援を漏れなく行う',
+   'ときどき相談への対応が遅れたり、支援の記録が遅れたりする',
+   '相談への対応が遅い、支援の漏れがある'],
+ 'チーム貢献':['担当の壁を越えて同僚を助け、知っていることを共有する',
+   '自分から他の人の仕事を手伝い、やり方や知識をチームに広める',
+   '自分から声をかけて手伝い、役に立つ情報を共有している',
+   '頼まれたら快く手伝い、必要な情報を共有する',
+   '手伝いや共有が、頼まれたときだけ・自分の都合がよいときだけになりがち',
+   '自分の担当以外には関わらない、情報を抱え込む'],
+ '誠実さ・規律':['ルールを守り、うそやごまかしをしない。勤務時間内は業務に集中し、すぐ連絡が取れる',
+   'ルールを守るだけでなく、周りの手本になっている',
+   'ルールを守り、勤務時間内はいつでも連絡が取れる。連絡が取れない予定はカレンダーに入れている',
+   'ルールを守り、ミスも正直に報告する。勤務時間内は業務に集中している',
+   'ときどき勤務時間内に連絡が取れない、共有事項を何度も聞き直すなどがある',
+   'ルール違反やごまかしがある。勤務時間内に連絡が取れないことが多い'],
+ '勤怠・自己管理':['遅刻・早退・打刻ミスをしない。休暇は申請・報告・引継ぎをルールどおり行う（休暇の回数や長さでは点にしない）',
+   '遅刻・早退・打刻ミスがない。休暇は早めに申請し、引継ぎも整える',
+   '遅刻・早退・打刻ミスがほとんどない。休暇の申請が早く、引継ぎもできている',
+   '遅刻・早退・打刻ミスはまれ。休暇の申請と報告をルールどおり行う',
+   'ときどき遅刻・打刻ミスがある。休暇の申請や引継ぎが直前になることがある',
+   '遅刻・早退・打刻ミスが多い。休暇の申請や報告をしないことがある'],
+ '届出：出張・経費':['出張の事前申請、出張・経費の申請を、期限どおりに不備なく出す',
+   '出張の事前申請、出張・経費の申請がすべて期限どおりで、不備もない',
+   '期限どおりに出し、不備がほとんどない',
+   '出張の事前申請を守り、提出の遅れはまれ',
+   'ときどき提出が遅れる、または不備があり、出し直しになる',
+   '事前申請なしの出張がある。提出の遅れを繰り返す'],
+ '改善・工夫':['今のやり方をよくする工夫をして、形にする（改善一覧に登録）',
+   '自分で仕組みを変え、チームの時間やミスを減らした',
+   '自分の工夫を、同じ仕事をする人にも広めている',
+   '自分の仕事のやり方を工夫して、速く・正確にしている',
+   '工夫しようとするが、形になるまで続かないことが多い',
+   '言われたやり方のままで、工夫が見られない'],
+ '提案・発言':['気づいたことや改善案を、自分から提案し、会議などで意見を言う',
+   '自分から改善案を出し、根拠をもって意見を言う。周りの意見も引き出す',
+   '会議などで自分から意見や提案を出し、理由も説明できる',
+   '気づいたことを提案し、自分の意見を言える',
+   '聞かれれば意見を言うが、自分から提案することは少ない',
+   '提案や意見をほとんど言わない'],
+ '挑戦・学習':['新しい仕事や知識に取り組み、できることを増やす',
+   '新しい仕事を自分から引き受け、学んだことを仕事に生かしている',
+   '自分から学び、新しい仕事にも前向きに取り組んでいる',
+   '必要な知識を学び、頼まれた新しい仕事に取り組む',
+   '新しい仕事に取り組むが、学ぶのは言われたときだけになりがち',
+   '新しい仕事を避ける。学ぼうとしない'],
+ 'チーム管理':['チームの仕事の進み具合と分担を見て、やり方をそろえる',
+   'チームの成果が上がるように、分担と進め方を自分で整えている',
+   'チームの進み具合を把握し、遅れる前に分担を調整できる',
+   'チームの進み具合を把握し、遅れに気づいて手を打てる',
+   'チームの状況の把握が、ときどき遅れる',
+   'チームの状況を把握していない'],
+ '育成':['後輩やメンバーに教え、一人でできるように育てる',
+   '育てた人が、一人で仕事を回せるようになった',
+   '相手に合わせて教え方を工夫し、少しずつ任せている',
+   '聞かれたことを丁寧に教え、やり方を伝えている',
+   '教えるが、聞かれたときだけになりがち',
+   '教えない、または任せきりにする'],
+ '複数チーム管理、判断と評価':['複数のチームを見て判断し、メンバーを公平に評価する',
+   'チームをまたいで人と仕事を動かし、評価の根拠を本人に説明できる',
+   '各チームの課題を早めにつかんで判断し、評価の根拠も記録している',
+   '各チームの状況をつかんで判断し、期限どおりに評価する',
+   'ときどき判断や評価が遅れる',
+   '判断が遅れる、評価の根拠があいまい'],
+ '分野の責任':['1つの分野を1人で回し、判断と結果に責任を持つ',
+   '分野の仕組みを自分で作り、会社の成果につなげている',
+   '分野の仕事を1人で回し、改善も自分で進めている',
+   '分野の仕事を1人で回し、判断して結果を報告する',
+   'ときどき判断を人に頼ったり、報告が遅れたりする',
+   '判断を人に任せきりにする、結果の報告がない'],
+ '方針と全体':['会社の方針づくりに入り、全体を見て判断する',
+   '会社全体の方向を示し、各部をまとめて動かしている',
+   '方針を各部の計画に落とし込み、全体を見て判断している',
+   '方針を理解して各部に伝え、全体を見て判断する',
+   'ときどき自分の部のことに偏った判断になる',
+   '自分の部のことしか見ていない']
+};
+const SCALE={5:'等級より上の水準',4:'期待以上に安定',3:'期待どおり',2:'ときどきできない',1:'改善が必要'};
+
+function items(grade){const a=[];BEHAVIOR.forEach(b=>b.items.forEach(i=>a.push(i)));(EXTRA[grade]||[]).forEach(i=>a.push(i));return a}
+function sc(arr,grade){const o={};items(grade).forEach((k,i)=>o[k]=arr[i]??null);return o}
+
+const LOC_DEC={kmt:'KMT支援案件',shokai:'紹介案件',shinsei:'申請のみ案件',both:'紹介＋申請案件'};
+function newLoc(){return{list:[0,0],hakkutsu:[0,0],main:'sns',mainv:[0,0],prop:{own:[0,0,0],all:[0,0,0]},dec:{kmt:[0,0],shokai:[0,0],shinsei:[0,0],both:[0,0]}}}
+function mk(name,grade,dept,title,lead,mix,kind){
+  return{name,grade,dept,title,lead,kind:kind||'staff',submitted:false,published:false,seikaIn:false,
+    mix:{tanto:mix[0],eigyo:mix[1],kanri:mix[2]},companies:0,workers:0,moved:{a:0,t:0},
+    rates:{newJob:[0,0],oldJob:[0,0],newDec:[0,0],oldDec:[0,0]},decided:0,kaizen:0,
+    self:sc([],grade),boss:sc([],grade),peer:{},peerBy:'',loc:newLoc(),
+    cap:false,fb:'',ceo:'',ep:{},memo:{},memoPub:{}}}
+const SHEET_KEYS=['submitted','published','seikaIn','mix','companies','workers','moved','rates','decided','kaizen','self','boss','peer','peerBy','loc','cap','fb','ceo','ep','memo','memoPub'];
+const GRADE_OPTS=['','1','2','3','4M','4S','5','現地','アルバイト'];
+const GCODE=g=>g==='現地'?'L':g==='アルバイト'?'P':(g||'2');
+const GORDER=['5','4M','4S','3','2','1','L','P'];
+let S={m:{},viewer:'admin',sel:null,tab:'seika',stab:'self',rmode:'group',page:'hyoka',phase:1,period:''};
+let VIEWERS=[];const snap={};
+const leadName=m=>!m.lead?'未設定':m.lead==='代表'?'代表':empName(m.lead);
+const STAFF=()=>Object.values(S.m).filter(x=>x.kind==='staff'&&['1','2','3'].includes(x.grade)).map(x=>x.name);
+/* 従業員＋その期の評価シート → 画面で使う1人分のデータ */
+function memberFrom(e,ev){
+  const g=GCODE(e.grade),kind=g==='L'?'local':g==='P'?'part':'staff';
+  const m=mk(empName(e.id),g,e.department||'',e.position||'',e.evalLead||'',kind==='staff'?[60,30,10]:[0,0,0],kind);
+  const sh=ev&&ev.sheet&&ev.sheet.v===2?ev.sheet:null;
+  if(sh){SHEET_KEYS.forEach(k=>{if(sh[k]!==undefined&&sh[k]!==null)m[k]=JSON.parse(JSON.stringify(sh[k]))});
+    /* 等級を変えたあとも、項目の数を今の等級に合わせる */
+    const keep=o=>{const r={};items(g).forEach(k=>r[k]=o&&o[k]!=null?o[k]:null);return r};
+    m.self=keep(m.self);m.boss=keep(m.boss)}
+  m.id=e.id;m.empNo=e.empNo||'';return m}
+function sheetOf(m){const o={v:2};SHEET_KEYS.forEach(k=>o[k]=m[k]);return o}
+function build(){
+  S.m={};
+  data.employees.filter(e=>e.status==='在籍'&&e.evalTarget)
+    .sort((a,b)=>GORDER.indexOf(GCODE(a.grade))-GORDER.indexOf(GCODE(b.grade))||String(a.empNo||'zzz').localeCompare(String(b.empNo||'zzz')))
+    .forEach(e=>{const ev=data.evaluations.find(v=>v.empId===e.id&&v.period===S.period);const m=memberFrom(e,ev);S.m[e.id]=m;snap[e.id]=JSON.stringify(sheetOf(m))});
+  const ids=Object.keys(S.m),adm=myRank()>=2,me=myEmpId();
+  VIEWERS=(adm?[{id:'admin',name:'管理者の画面',role:'admin',grp:'管理する人'}]:[])
+    .concat(ids.filter(id=>adm||id===me).map(id=>({id:'self-'+id,name:S.m[id].name+'（本人の画面）',role:'self',mid:id,grp:'本人の画面'})));
+  if(!S.m[S.sel])S.sel=ids[0]||null;
+  if(!VIEWERS.some(v=>v.id===S.viewer))S.viewer=VIEWERS.length?VIEWERS[0].id:'';
+}
+function statusOf(m){if(m.published)return['フィードバック公開済み','p-ok'];if(m.submitted)return['自己評価 提出済み','p-acc'];
+  const a=avg(m.self);return a.n?['自己評価 入力中（'+a.n+'/'+Object.keys(m.self).length+'）','p-warn']:['自己評価 未入力','p-warn']}
+/* 保存：変わった人の分だけ、少し待ってからデータベースに書く */
+let saveT=null;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>{saveT=null;persist(S.m,S.period)},500)}
+function flush(){if(saveT){clearTimeout(saveT);saveT=null;persist(S.m,S.period)}}
+async function persist(mm,period){
+  if(myRank()<2)return;
+  for(const id of Object.keys(mm)){
+    const m=mm[id],sheet=sheetOf(m),js=JSON.stringify(sheet);
+    if(snap[id]===js)continue;
+    const st=m.published?'確定':m.submitted?'上長評価中':avg(m.self).n?'自己評価中':'目標設定';
+    let ev=data.evaluations.find(v=>v.empId===id&&v.period===period);
+    const prev=snap[id];snap[id]=js;
+    try{
+      if(!ev){ev=newEvalObj(id,period);ev.sheet=sheet;ev.status=st;data.evaluations.push(ev);await q(sb.from('evaluations').insert(evalToDb(ev)))}
+      else{ev.sheet=sheet;ev.status=st;await q(sb.from('evaluations').update({sheet:sheet,status:st}).eq('id',ev.id))}
+      const el=document.getElementById('hy-saved');if(el)el.textContent='保存しました '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+    }catch(e){snap[id]=prev;const el=document.getElementById('hy-saved');if(el)el.textContent='保存できませんでした'}
+  }
+}
+
+/* ---------- 半期の流れ（クリックで段階を切り替える） ---------- */
+const FLOW=[
+ {t:'期初：個人目標',d:'7/1〜7/15',admin:'所属部の部長が、仕事の割合（担当・営業・管理）と目標の案を作り、本人と話して決める。インセンティブの目標の選び方（アップ・現状維持・下げる）もここで決める。',self:'評価者と話して、今期の仕事の割合と目標を決めます。',go:{admin:['seika','成果タブ（仕事の割合）を開く'],self:['seika','成果を見る']}},
+ {t:'期中',d:'7月〜11月',admin:'成果の数字を管理者が入力する（今後、業務管理システムから自動で取り込む予定）。',self:'成果の数字は管理者が入力します。',go:{admin:['seika','成果タブを開く'],self:['seika','成果を見る']}},
+ {t:'自己評価の入力',d:'11/15〜',admin:'本人が、行動の各項目を1〜5点で入力する。評価者はこの段階では見るだけ。',self:'行動の各項目を、1〜5点で選びます。',go:{admin:['selfview','本人の画面で試す'],self:['self','自己評価を入力する']}},
+ {t:'本人の提出',d:'12/15まで',admin:'本人が提出すると評価者に通知される。評価者は行動の評価を付ける。必要なら本人に差し戻す。',self:'すべての項目を選んだら提出します。提出後は自分では直せません。',go:{admin:['koudou','行動タブ（管理者の評価）を開く'],self:['self','提出する']}},
+ {t:'代表の査定・確定',d:'12月末まで',admin:'総合点とランクを材料に、代表が昇給などを判断し、査定メモを書く。',self:'代表が査定します。この段階では、本人がすることはありません。',go:{admin:['sougou','総合タブを開く'],self:['fb','結果を見る']}},
+ {t:'フィードバック',d:'1/15ごろ',admin:'評価者がフィードバックを書き、「本人に公開する」にチェックすると、本人の画面に結果が出る。',self:'総合点・ランク・評価者からのフィードバックが見られます。',go:{admin:['sougou','総合タブ（フィードバック）を開く'],self:['fb','結果とフィードバックを見る']}},
+ {t:'昇給の反映',d:'1月から',admin:'代表が決めた昇給を、1月の給与から反映する（経営管理室）。',self:'昇給がある場合、1月の給与から反映されます。',go:{admin:null,self:null}}
+];
+function flowHTML(mode){const ph=S.phase??1,f=FLOW[ph],g=f.go[mode];
+  return `<div class="flow">${FLOW.map((s,i)=>`<button type="button" class="step ${i<ph?'done':i===ph?'now':''}" data-ph="${i}" aria-pressed="${i===ph}"><b>${s.t}</b><span>${s.d}</span></button>`).join('')}</div>
+  <div class="flowdetail"><div><b>${f.t}（${f.d}）</b><p>${mode==='self'?f.self:f.admin}</p></div>${g?`<button class="btn primary" type="button" id="flowgo">${g[1]}</button>`:''}</div>
+  <p class="note">段階をクリックすると、その時点でやることの説明が出ます。</p>`}
+function bindFlow(mode){
+  document.querySelectorAll('[data-ph]').forEach(b=>b.addEventListener('click',()=>{S.phase=+b.dataset.ph;save();render()}));
+  const g=document.getElementById('flowgo');if(!g)return;
+  g.addEventListener('click',()=>{const a=FLOW[S.phase??1].go[mode][0];
+    if(mode==='self'){S.stab=a}
+    else if(a==='inc'){S.page='inc'}
+    else if(a==='selfview'){S.viewer='self-'+S.sel;S.stab='self'}
+    else{S.page='hyoka';S.tab=a}
+    save();render();const d=document.getElementById(mode==='self'?'sbody':'detail');if(d&&a!=='inc'&&a!=='selfview')d.scrollIntoView({block:'start'})});
+}
+
+/* ---------- 点の計算 ---------- */
+const band=(x,c)=>{for(let i=0;i<c.length;i++)if(x>=c[i])return 5-i;return 1};
+const f1=x=>(Math.round(x*10)/10).toFixed(1);
+const fx=x=>x==null?'—':f1(x);
+const pct=x=>(x*100).toFixed(0)+'%';
+function tantoP(m){const q=m.companies/20+m.workers/100;return{q,p:band(q,[2.4,1.8,1.2,.6])}}
+function movedP(m){if(!m.moved.t)return{p:3,note:'目標なし→3点'};const r=m.moved.a/m.moved.t;return{r,p:band(r,[1.2,1.0,.8,.5])}}
+function rateP(k,m){const[n,d]=m.rates[k];if(d<5)return{p:3,note:'分母5未満→3点',n,d};const r=n/d;return{r,vs:r/STD[k],p:band(r/STD[k],[1.5,1.2,.8,.5]),n,d}}
+function ratesAvg(m){const ks=Object.keys(RATE_LABEL);return ks.reduce((s,k)=>s+rateP(k,m).p,0)/ks.length}
+function decidedP(m){return{p:band(m.decided/STD.decided,[1.5,1.2,.8,.5])}}
+function eigyoP(m){return .4*movedP(m).p+.3*ratesAvg(m)+.3*decidedP(m).p}
+function kanriP(m){return m.kaizen>=4?5:m.kaizen+1}
+const B1=[1.2,1,.8,.5],B2=[1.5,1.2,.8,.5];
+function locCalc(m){const L=m.loc;
+  const mv=[L.list,L.hakkutsu,L.mainv].map(([a,t])=>t?band(a/t,B1):null);
+  const pr=['own','all'].map(k=>{const[n,d,st]=L.prop[k];if(d<5)return 3;return st?band(n/d/(st/100),B2):null});
+  const dc=Object.keys(LOC_DEC).map(k=>{const[n,st]=L.dec[k];return st?band(n/st,B2):null});
+  const av=a=>{const v=a.filter(x=>x!=null);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null};
+  const g=[av(mv),av(pr),av(dc)],w=[.4,.3,.3];let ws=0,ss=0;g.forEach((x,i)=>{if(x!=null){ws+=w[i];ss+=x*w[i]}});
+  return{mv,pr,dc,g,total:ws?ss/ws:null}}
+function seika(m){if(!m.seikaIn)return null;if(m.kind==='local')return locCalc(m).total;
+  return(tantoP(m).p*m.mix.tanto+eigyoP(m)*m.mix.eigyo+kanriP(m)*m.mix.kanri)/100}
+function avg(o){const v=Object.values(o).filter(x=>x!=null&&x!=='');return v.length?{a:v.reduce((s,x)=>s+ +x,0)/v.length,n:v.length,miss:Object.keys(o).length-v.length}:{a:null,n:0,miss:Object.keys(o).length}}
+function koudou(m){return avg(m.boss)}
+function total(m){const r=RATIO[m.grade];const k=koudou(m),sk=seika(m);if(k.a==null)return null;if(r===0)return k.a;if(sk==null)return null;return sk*r+k.a*(1-r)}
+function rank(x,cap){if(x==null)return'—';let r=x>=4.5?'S':x>=3.7?'A':x>=2.8?'B':x>=2.0?'C':'D';if(cap&&(r==='S'||r==='A'))r='B';return r}
+
+/* ---------- 権限 ---------- */
+const V=()=>VIEWERS.find(v=>v.id===S.viewer)||VIEWERS[0]||{id:'',role:'view'};
+function canEdit(m,item){return V().role==='admin'}
+function canEditAny(m){return V().role==='admin'}
+
+/* ---------- 描画 ---------- */
+let app=null,root=null;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function render(){
+  const v=V();
+  syncTop();
+  if(S.page==='settings'){renderSettings();return}
+  if(!Object.keys(S.m).length){app.innerHTML=`<section class="hpanel"><div class="lock"><b>評価の対象者がまだいません</b><p class="muted">${myRank()>=2?'右上の「対象者の設定」で、評価する人と等級・評価者を選んでください。':'評価シートがまだ作られていません。'}</p></div></section>`;return}
+  if(v.role==='self'){renderSelf(v.mid);return}
+  app.innerHTML=`
+  <section class="hpanel">
+    <div class="head"><h1>${esc(S.period)}の人事評価</h1>
+      <span class="pill ${v.role==='admin'?'p-acc':'p-soft'}">${v.role==='admin'?'管理者：全員の評価を入力できます':'閲覧のみ'}</span></div>
+    ${flowHTML('admin')}
+    <p class="note">数字と点は、入力するとすぐに保存されます。仕事の割合（担当・営業・管理）は仮の値から始まるので、期初に決めた割合に直してください。本人の自己評価は、上の「表示」で本人の画面に切り替えると入力できます。</p>
+  </section>
+  <section class="hpanel">
+    <h2>メンバー一覧（${Object.keys(S.m).length}名）</h2>
+    <div class="tw"><table id="list"><thead><tr>
+      <th>名前</th><th>等級</th><th>所属・肩書</th><th>評価者</th><th class="n">成果</th><th class="n">行動</th><th class="n">総合</th><th>ランク</th><th>状況</th>
+    </tr></thead><tbody>${Object.entries(S.m).map(([id,m])=>{const t=total(m),k=koudou(m),r=rank(t,m.cap);
+      return `<tr data-id="${id}" tabindex="0" class="${S.sel===id?'sel':''}"><td class="name">${esc(m.name)}</td><td>${m.grade==='L'?'現地':m.grade==='P'?'アルバイト':m.grade}</td><td>${esc(m.dept)}${m.title?'　'+esc(m.title):''}</td><td>${leadName(m)}</td>
+      <td class="n">${fx(seika(m))}</td><td class="n">${k.a==null?'—':f1(k.a)}</td><td class="n">${t==null?'—':f1(t)}</td>
+      <td><span class="rank r-${r}">${r}</span>${m.cap?' <span class="pill p-warn">上限B</span>':''}</td>
+      <td><span class="pill ${statusOf(m)[1]}">${statusOf(m)[0]}</span></td></tr>`}).join('')}</tbody></table></div>
+  </section>
+  <section class="hpanel" id="detail"></section>`;
+  document.querySelectorAll('#list tbody tr').forEach(tr=>{
+    const go=()=>{S.sel=tr.dataset.id;save();render()};
+    tr.addEventListener('click',go);tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}})});
+  bindFlow('admin');
+  renderDetail();
+}
+
+function renderDetail(){
+  const m=S.m[S.sel],el=document.getElementById('detail'),ed=canEditAny(m);
+  const tabs=[['graph','グラフで見る'],['seika','成果'],['koudou','行動'],['sougou','総合・フィードバック']];
+  el.innerHTML=`<div class="head"><div><h2 style="margin:0">${esc(m.name)}　<span class="muted">${gl(m)}／${esc(m.dept)}${m.title?'　'+esc(m.title):''}／評価：${leadName(m)}</span></h2></div>
+    ${ed?'<span class="pill p-acc">編集できます</span>':'<span class="pill p-soft">閲覧のみ</span>'}</div>
+    <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" type="button" data-tab="${k}" aria-selected="${S.tab===k}">${l}</button>`).join('')}</div>
+    <div id="tabbody"></div>`;
+  el.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{S.tab=b.dataset.tab;save();renderDetail()}));
+  const body=el.querySelector('#tabbody');
+  ({graph:(mm,bb)=>tabGraph(mm,bb,'admin'),seika:tabSeika,koudou:tabKoudou,sougou:tabSougou})[S.tab](m,body,ed);
+}
+
+function num(id,val,dis){return `<input type="number" id="${id}" value="${val}" min="0" step="1" ${dis?'disabled':''}>`}
+
+function tabSeika(m,b,ed){
+  if(m.kind==='part'){b.innerHTML='<p class="note" style="margin-top:10px">アルバイトは、行動だけで評価します（成果の数字はありません）。</p>';return}
+  if(m.kind==='local')return tabSeikaLocal(m,b,ed);
+  const E=m.seikaIn,t=tantoP(m),mv=movedP(m),dc=decidedP(m),sum=m.mix.tanto+m.mix.eigyo+m.mix.kanri;
+  b.innerHTML=`
+  <h3>仕事の割合（期初に評価者が案を作り、本人と話して決める）</h3>
+  <div class="mix">
+    <label for="mx-tanto">担当 ${mixSel('mx-tanto',m.mix.tanto,!ed)}</label>
+    <label for="mx-eigyo">営業 ${mixSel('mx-eigyo',m.mix.eigyo,!ed)}</label>
+    <label for="mx-kanri">管理 ${mixSel('mx-kanri',m.mix.kanri,!ed)}</label>
+    <span class="muted">合計 ${sum}%</span>
+  </div>
+  <div class="bar-mix" aria-hidden="true"><i style="width:${m.mix.tanto}%;background:var(--accent)"></i><i style="width:${m.mix.eigyo}%;background:var(--ok)"></i><i style="width:${m.mix.kanri}%;background:var(--warn)"></i></div>
+  ${sum!==100?'<div class="warnline">割合の合計を100%にしてください。</div>':''}
+  ${E?`<div class="formula" style="margin-top:12px">成果点 ＝ 担当 ${t.p} × ${m.mix.tanto}% ＋ 営業 ${f1(eigyoP(m))} × ${m.mix.eigyo}% ＋ 管理 ${kanriP(m)} × ${m.mix.kanri}% ＝ <b>${f1(seika(m))}</b></div>`:'<div class="warnline">成果の数字はまだ入っていません。下の欄に数字を入れると、点が出ます。</div>'}
+
+  <div class="grid2" style="margin-top:14px">
+    <div class="box"><div class="box-h"><b>① 担当</b><span class="score">${E?t.p:'—'}<small> 点</small></span></div>
+      <dl class="kv"><dt><label for="in-companies">メイン担当の企業数</label></dt><dd>${num('in-companies',m.companies,!ed)} 社</dd>
+      <dt><label for="in-workers">人材担当の人数</label></dt><dd>${num('in-workers',m.workers,!ed)} 人</dd>
+      <dt>担当の量</dt><dd>${m.companies}÷20 ＋ ${m.workers}÷100 ＝ ${t.q.toFixed(2)}</dd></dl>
+      <p class="note">2.4以上＝5／1.8〜＝4／1.2〜＝3／0.6〜＝2／0.6未満＝1</p></div>
+
+    <div class="box"><div class="box-h"><b>③ 管理</b><span class="score">${E?kanriP(m):'—'}<small> 点</small></span></div>
+      <dl class="kv"><dt><label for="in-kaizen">改善一覧の件数（部長確認済み）</label></dt><dd>${num('in-kaizen',m.kaizen,!ed)} 件</dd></dl>
+      <p class="note">半期の件数（例）：4件以上＝5／3件＝4／2件＝3／1件＝2／0件＝1</p></div>
+  </div>
+
+  <div class="box" style="margin-top:14px"><div class="box-h"><b>② 営業：動いた数・確率・決まった数の3つで見る</b>
+    <span class="score">${E&&m.mix.eigyo?f1(eigyoP(m)):'—'}<small> 点${m.mix.eigyo?'':'（割合0%）'}</small></span></div>
+    <div class="formula" style="margin-top:8px">営業点 ＝ 動いた数 ${mv.p} × 40% ＋ 確率 ${f1(ratesAvg(m))} × 30% ＋ 決まった数 ${dc.p} × 30%</div>
+    <div class="tw" style="margin-top:8px"><table><thead><tr><th>見るもの</th><th class="n">実績</th><th class="n">比べる数字</th><th class="n">比</th><th class="n">点</th></tr></thead><tbody>
+      <tr><td>動いた数（営業・連絡した企業数）</td><td class="n">${num('in-moved-a',m.moved.a,!ed)}</td><td class="n">目標 ${num('in-moved-t',m.moved.t,!ed)}</td><td class="n">${mv.r==null?'—':pct(mv.r)}</td><td class="n">${mv.p}</td></tr>
+      ${Object.keys(RATE_LABEL).map(k=>{const r=rateP(k,m);return `<tr><td>${RATE_LABEL[k]}</td>
+        <td class="n">${num('rt-'+k+'-0',r.n,!ed)} / ${num('rt-'+k+'-1',r.d,!ed)}</td><td class="n">全社 ${pct(STD[k])}</td>
+        <td class="n">${r.vs==null?'<span class="muted">'+r.note+'</span>':pct(r.r)+'（'+pct(r.vs)+'）'}</td><td class="n">${r.p}</td></tr>`}).join('')}
+      <tr><td>確率の平均（4つ）</td><td></td><td></td><td></td><td class="n"><b>${f1(ratesAvg(m))}</b></td></tr>
+      <tr><td>決まった数（決定した件数）</td><td class="n">${num('in-decided',m.decided,!ed)}</td><td class="n">全社 ${STD.decided}件</td><td class="n">${pct(m.decided/STD.decided)}</td><td class="n">${dc.p}</td></tr>
+    </tbody></table></div>
+    <p class="note">動いた数は目標に対して：120%以上＝5／100〜＝4／80〜＝3／50〜＝2／50%未満＝1。確率と決まった数は全社の標準に対して：150%以上＝5／120〜＝4／80〜＝3／50〜＝2／50%未満＝1。半期の合計で見る。</p>
+  </div>`;
+  const on=(id,fn)=>{const e=b.querySelector('#'+id);if(e)e.addEventListener('change',()=>{fn(e.value);if(id.indexOf('mx-')!==0)m.seikaIn=true;save();render()})};
+  ['tanto','eigyo','kanri'].forEach(k=>on('mx-'+k,v=>m.mix[k]=+v));
+  on('in-companies',v=>m.companies=Math.max(0,+v||0));on('in-workers',v=>m.workers=Math.max(0,+v||0));
+  on('in-kaizen',v=>m.kaizen=Math.max(0,+v||0));on('in-decided',v=>m.decided=Math.max(0,+v||0));
+  on('in-moved-a',v=>m.moved.a=Math.max(0,+v||0));on('in-moved-t',v=>m.moved.t=Math.max(0,+v||0));
+  Object.keys(RATE_LABEL).forEach(k=>[0,1].forEach(i=>on('rt-'+k+'-'+i,v=>m.rates[k][i]=Math.max(0,+v||0))));
+}
+function tabSeikaLocal(m,b,ed){
+  const L=m.loc,c=locCalc(m),E=m.seikaIn,P=x=>x==null?'—':x,dis=!ed,isSns=L.main==='sns';
+  const mvRows=[['1. 元技能実習生のリスト追加','list',L.list,'件'],['2. 新規企業の発掘','hak',L.hakkutsu,'件'],['3. '+(isSns?'フォロワー数の追加':'提携先数の追加'),'mainv',L.mainv,isSns?'人':'件']];
+  b.innerHTML=`
+  ${E?`<div class="formula" style="margin-top:12px">成果点 ＝ 動いた数 ${fx(c.g[0])} × 40% ＋ 確率 ${fx(c.g[1])} × 30% ＋ 決まった数 ${fx(c.g[2])} × 30% ＝ <b>${fx(c.total)}</b></div>`:'<div class="warnline">成果の数字はまだ入っていません。下の欄に数字を入れると、点が出ます。</div>'}
+  <p class="note">現地スタッフの成果は、動いた数・確率・決まった数の3つで見ます。目標や標準が入っていないグループは、計算から外します。</p>
+  <div class="box" style="margin-top:12px"><div class="box-h"><b>① 動いた数（40%）</b><span class="score">${E?fx(c.g[0]):'—'}<small> 点</small></span></div>
+    <div class="addrow"><label for="lc-main" class="muted">メインの集客方法（どちらか1つ）</label><select class="sc" id="lc-main" ${dis?'disabled':''}><option value="sns" ${isSns?'selected':''}>SNS（フォロワー数）</option><option value="teikei" ${isSns?'':'selected'}>送り出し機関・提携先（提携先数）</option></select></div>
+    <div class="tw" style="margin-top:8px"><table><thead><tr><th>項目</th><th class="n">実績</th><th class="n">目標</th><th class="n">達成率</th><th class="n">点</th></tr></thead><tbody>
+    ${mvRows.map(([l,k,v,u],i)=>`<tr><td>${l}</td><td class="n">${num('lc-'+k+'-0',v[0],dis)} ${u}</td><td class="n">${num('lc-'+k+'-1',v[1],dis)} ${u}</td><td class="n">${v[1]?pct(v[0]/v[1]):'—'}</td><td class="n">${P(c.mv[i])}</td></tr>`).join('')}
+    </tbody></table></div>
+    <p class="note">目標に対して：120%以上＝5／100〜＝4／80〜＝3／50〜＝2／50%未満＝1。3つの平均が点になります。</p></div>
+  <div class="box" style="margin-top:14px"><div class="box-h"><b>② 確率（30%）</b><span class="score">${E?fx(c.g[1]):'—'}<small> 点</small></span></div>
+    <div class="tw" style="margin-top:8px"><table><thead><tr><th>項目</th><th class="n">自分が提案した候補者</th><th class="n">求人の募集人数</th><th class="n">提案率</th><th class="n">全社の標準（%）</th><th class="n">点</th></tr></thead><tbody>
+    ${[['4. 提案率（自分の国籍）','own'],['5. 提案率（国籍を問わず）','all']].map(([l,k],i)=>{const v=L.prop[k];return `<tr><td>${l}</td><td class="n">${num('lc-'+k+'-0',v[0],dis)} 人</td><td class="n">${num('lc-'+k+'-1',v[1],dis)} 人</td><td class="n">${v[1]?pct(v[0]/v[1]):'—'}</td><td class="n">${num('lc-'+k+'-2',v[2],dis)}</td><td class="n">${v[1]<5?'<span class="muted">分母5未満→</span>3':P(c.pr[i])}</td></tr>`}).join('')}
+    </tbody></table></div>
+    <p class="note">全社の標準に対して：150%以上＝5／120〜＝4／80〜＝3／50〜＝2／50%未満＝1。募集人数が5人未満のときは3点。</p></div>
+  <div class="box" style="margin-top:14px"><div class="box-h"><b>③ 決まった数（30%）</b><span class="score">${E?fx(c.g[2]):'—'}<small> 点</small></span></div>
+    <div class="tw" style="margin-top:8px"><table><thead><tr><th>決定報告の区分</th><th class="n">決定した件数</th><th class="n">全社の標準（件）</th><th class="n">点</th></tr></thead><tbody>
+    ${Object.keys(LOC_DEC).map((k,i)=>{const v=L.dec[k];return `<tr><td>${6+i}. ${LOC_DEC[k]}</td><td class="n">${num('lc-dec-'+k+'-0',v[0],dis)}</td><td class="n">${num('lc-dec-'+k+'-1',v[1],dis)}</td><td class="n">${v[1]?P(c.dc[i]):'<span class="muted">標準なし（除く）</span>'}</td></tr>`}).join('')}
+    </tbody></table></div>
+    <p class="note">自分が提案した候補者が決定した件数。標準を入れた区分だけを平均します。</p></div>`;
+  const on=(id,fn)=>{const e=b.querySelector('#'+id);if(e)e.addEventListener('change',()=>{fn(e.value);if(id!=='lc-main')m.seikaIn=true;save();render()})};
+  const nv=v=>Math.max(0,+v||0);
+  on('lc-main',v=>L.main=v);
+  [['list',L.list],['hak',L.hakkutsu],['mainv',L.mainv]].forEach(([k,a])=>[0,1].forEach(i=>on('lc-'+k+'-'+i,v=>a[i]=nv(v))));
+  ['own','all'].forEach(k=>[0,1,2].forEach(i=>on('lc-'+k+'-'+i,v=>L.prop[k][i]=nv(v))));
+  Object.keys(LOC_DEC).forEach(k=>[0,1].forEach(i=>on('lc-dec-'+k+'-'+i,v=>L.dec[k][i]=nv(v))));
+}
+function localBars(m){const c=locCalc(m);return `<div class="box"><div class="box-h"><b>成果：現地スタッフの3つの見方</b><span class="score">${fx(c.total)}<small> / 5</small></span></div>
+  <div class="hbar">${hbar('動いた数',c.g[0],5,'var(--accent)',fx(c.g[0])+'点 × 40%','リスト追加・新規企業・集客')}${hbar('確率',c.g[1],5,'var(--ok)',fx(c.g[1])+'点 × 30%','提案率（自分の国籍・国籍を問わず）')}${hbar('決まった数',c.g[2],5,'var(--warn)',fx(c.g[2])+'点 × 30%','決定報告の4区分')}</div>
+  <p class="note">棒の長さ＝点（5点満点）。目標や標準が入っていないグループは計算から外します。</p></div>`}
+function mixSel(id,val,dis){let o='';for(let i=0;i<=100;i+=10)o+=`<option value="${i}" ${i===val?'selected':''}>${i}%</option>`;return `<select class="sc" id="${id}" ${dis?'disabled':''}>${o}</select>`}
+
+function scoreSel(id,val,dis){return `<select class="sc" id="${id}" ${dis?'disabled':''}><option value="">—</option>${[5,4,3,2,1].map(n=>`<option value="${n}" ${+val===n?'selected':''}>${n}</option>`).join('')}</select>`}
+
+function tabKoudou(m,b){
+  const s=avg(m.self),k=avg(m.boss),ex=EXTRA[m.grade]||[],PL=m.kind==='local',pa=avg(m.peer||{}),ceA=canEditAny(m);
+  const row=(it,i)=>{const sv=m.self[it],bv=m.boss[it],d=(sv!=null&&bv!=null&&bv!=='')?bv-sv:null;
+    const D=DESC[it],ce=canEdit(m,it);
+    return `<tr><td class="item"><div class="iname"><span class="ino">${i+1}</span>${esc(it)}${NEW.has(it)?'<span class="new">新</span>':''}${it==='企業への対応'?' <span class="muted">（営業部の部長の意見を聞いて付ける）</span>':''}</div>
+    ${D?`<div class="idesc">${esc(D[0])}</div><details><summary>5点〜1点の姿</summary><dl class="lv">${[5,4,3,2,1].map((p,j)=>`<dt>${p}点</dt><dd>${esc(D[j+1])}</dd>`).join('')}</dl></details>`:''}</td>
+    <td class="n">${sv==null?'<span class="muted">未入力</span>':sv}</td>${PL?`<td class="n">${scoreSel('pr-'+i,m.peer[it],!ceA)}</td>`:''}
+    <td class="ep"><div class="epread">${m.ep[it]?esc(m.ep[it]):'<span class="muted">記入なし</span>'}</div></td>
+    <td class="ep"><textarea class="sm" id="mm-${i}" aria-label="${esc(it)}の管理者メモ" placeholder="管理者メモ" ${ce?'':'disabled'}>${esc(m.memo[it]||'')}</textarea>
+      <label class="pubchk" for="mp-${i}"><input type="checkbox" id="mp-${i}" ${m.memoPub[it]?'checked':''} ${ce?'':'disabled'}>本人に公表</label></td>
+    <td class="n">${scoreSel('bs-'+i,bv,!ce)}</td>
+    <td class="n">${d==null?'':d>0?'<span class="diff-up">+'+d+'</span>':d<0?'<span class="diff-down">'+d+'</span>':'0'}</td></tr>`};
+  let i=0;
+  b.innerHTML=`
+  <div class="grid2" style="margin-top:10px">
+    <div class="box"><div class="box-h"><b>行動点（管理者の評価の平均）</b><span class="score">${k.a==null?'—':f1(k.a)}<small> 点</small></span></div>
+      <p class="note">自己評価の平均：${s.a==null?'未入力':f1(s.a)}${k.miss?'　／　管理者の未入力：'+k.miss+'項目':''}</p></div>
+    <div class="box"><b>点の意味</b><p class="note" style="margin-top:4px">${[5,4,3,2,1].map(n=>n+'＝'+SCALE[n]).join('／')}</p></div>
+  </div>
+  ${PL?`<div class="addrow"><label for="peerby" class="muted">同僚の評価をする社員（同じ国籍の担当）</label><select class="sc" id="peerby" ${ceA?'':'disabled'}><option value="">未設定</option>${STAFF().map(n=>`<option ${m.peerBy===n?'selected':''}>${n}</option>`).join('')}</select><span class="muted">同僚の評価の平均：${pa.a==null?'未入力':f1(pa.a)}（総合点には入れず、管理者が評価するときの参考にします）</span></div>`:''}
+  <div class="tw" style="margin-top:12px"><table><thead><tr><th>項目</th><th class="n">自己評価</th>${PL?'<th class="n">同僚の評価</th>':''}<th>本人のエピソード</th><th>管理者メモ</th><th class="n">管理者の評価</th><th class="n">差</th></tr></thead><tbody>
+    ${BEHAVIOR.map(g=>`<tr><th colspan="${PL?7:6}">${g.g}</th></tr>`+g.items.map(it=>row(it,i++)).join('')).join('')}
+    ${ex.length?`<tr><th colspan="${PL?7:6}">${gl(m)}で増える項目</th></tr>`+ex.map(it=>row(it,i++)).join(''):''}
+  </tbody></table></div>
+  ${m.submitted&&canEditAny(m)?'<div class="addrow"><span class="pill p-acc">自己評価 提出済み</span><button class="btn" type="button" id="sendback">本人に差し戻す</button></div>':''}
+  <p class="note">自己評価とエピソードは本人が「本人の画面」で入力します。管理者メモは、「本人に公表」にチェックした項目だけ、結果の公開後に本人に見えます（点数は全項目見えます）。差が大きい項目は、フィードバックで話し合う材料にします。休暇は回数や長さで点にせず、「勤怠・自己管理」で申請・報告と、連休のときの引継ぎ・調整を見ます。</p>`;
+  items(m.grade).forEach((it,j)=>{const e=b.querySelector('#bs-'+j);if(e)e.addEventListener('change',()=>{m.boss[it]=e.value===''?null:+e.value;save();render()});
+    const mm=b.querySelector('#mm-'+j);if(mm)mm.addEventListener('change',()=>{m.memo[it]=mm.value;save()});
+    const pr=b.querySelector('#pr-'+j);if(pr)pr.addEventListener('change',()=>{m.peer[it]=pr.value===''?null:+pr.value;save();render()});
+    const mp=b.querySelector('#mp-'+j);if(mp)mp.addEventListener('change',()=>{m.memoPub[it]=mp.checked;save()})});
+  const pb=b.querySelector('#peerby');if(pb)pb.addEventListener('change',()=>{m.peerBy=pb.value;save()});
+  const sb=b.querySelector('#sendback');if(sb)sb.addEventListener('click',()=>{m.submitted=false;m.published=false;save();render()});
+}
+
+function tabSougou(m,b,ed){
+  const r=RATIO[m.grade],sk=seika(m),k=koudou(m),t=total(m),rk=rank(t,m.cap),raw=rank(t,false);
+  b.innerHTML=`
+  <div class="grid2" style="margin-top:10px">
+    <div class="box"><div class="box-h"><b>総合点</b><span><span class="score">${t==null?'—':f1(t)}</span> <span class="rank r-${rk}" style="vertical-align:middle">${rk}</span></span></div>
+      <div class="formula" style="margin-top:8px">成果 ${fx(sk)} × ${Math.round(r*100)}% ＋ 行動 ${k.a==null?'—':f1(k.a)} × ${Math.round((1-r)*100)}%（${gl(m)}）</div>
+      <p class="note">S 4.5以上／A 3.7〜4.49／B 2.8〜3.69／C 2.0〜2.79／D 2.0未満</p>
+      <label class="chk" for="cap"><input type="checkbox" id="cap" ${m.cap?'checked':''} ${ed?'':'disabled'}><span>この期に、記録簿の未記入放置・届出漏れ・個人情報の事故があった（点数にかかわらず、ランクの上限をBにする）</span></label>
+      ${m.cap&&raw!==rk?`<div class="warnline">点数ではランク${raw}ですが、上限のためBにしています。</div>`:''}
+    </div>
+    <div class="box"><b>昇給・昇格・降格</b>
+      <p class="note" style="margin-top:6px">評価は判断の材料で、決めるのは代表です。昇格は、代表が決めたとき、または役割が空いた・増えたとき（目安：2期続けてA以上＋1つ上の等級の行動項目が3点以上）。</p>
+      <label for="ceo" class="muted" style="display:block;margin-top:8px">代表の査定メモ</label>
+      <textarea id="ceo" ${V().role==='admin'&&V().id!==m.id?'':'disabled'} placeholder="代表の査定のときに記入">${esc(m.ceo)}</textarea></div>
+  </div>
+  <div class="box" style="margin-top:14px"><label for="fb"><b>フィードバック（${leadName(m)}が記入、1/15ごろ）</b></label>
+    <textarea id="fb" style="margin-top:8px" ${ed?'':'disabled'} placeholder="よかった点、次の半期に伸ばしてほしい点">${esc(m.fb)}</textarea>
+    <label class="chk" for="pub"><input type="checkbox" id="pub" ${m.published?'checked':''} ${ed?'':'disabled'}><span><b>本人に公開する</b>（代表の査定が終わったら。公開すると、本人の画面に総合点・ランク・フィードバックが出ます）</span></label>
+</div>`;
+  const pb=b.querySelector('#pub');pb.addEventListener('change',()=>{m.published=pb.checked;save();render()});
+  const c=b.querySelector('#cap');c.addEventListener('change',()=>{m.cap=c.checked;save();render()});
+  b.querySelector('#fb').addEventListener('change',e=>{m.fb=e.target.value;save()});
+  b.querySelector('#ceo').addEventListener('change',e=>{m.ceo=e.target.value;save()});
+}
+
+/* ---------- グラフ ---------- */
+function grpAvg(m,src){
+  const gs=BEHAVIOR.map(g=>({l:g.g,items:g.items})),ex=EXTRA[m.grade]||[];
+  if(ex.length)gs.push({l:'等級で増える項目',items:ex});
+  return{labels:gs.map(g=>g.l),vals:gs.map(g=>{const v=g.items.map(i=>src[i]).filter(x=>x!=null&&x!=='');return v.length?v.reduce((a,b)=>a+ +b,0)/v.length:null})}}
+function radarSVG(labels,series){
+  const N=labels.length,cx=290,cy=225,R=140,LR=R+16,pt=(i,r)=>{const a=-Math.PI/2+2*Math.PI*i/N;return[cx+Math.cos(a)*r,cy+Math.sin(a)*r]};
+  let s=`<svg class="radar" viewBox="0 0 580 450" role="img" aria-label="行動評価のレーダーチャート">`;
+  for(let k=1;k<=5;k++){s+=`<polygon class="ring ${k===3?'m':''}" points="${labels.map((_,i)=>pt(i,R*k/5).join(',')).join(' ')}"/>`}
+  labels.forEach((l,i)=>{const[x,y]=pt(i,R);s+=`<line class="axis" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/>`});
+  for(let k=1;k<=5;k++)s+=`<text class="tick" x="${cx+4}" y="${cy-R*k/5+3}">${k}</text>`;
+  series.forEach(se=>{if(!se.vals.some(v=>v!=null))return;
+    const pts=se.vals.map((v,i)=>pt(i,R*(v==null?0:v)/5));
+    s+=`<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${se.color}" fill-opacity=".16" stroke="${se.color}" stroke-width="2.2" stroke-linejoin="round" ${se.dash?'stroke-dasharray="6 4"':''}/>`;
+    se.vals.forEach((v,i)=>{if(v!=null)s+=`<circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="3.6" fill="${se.color}"><title>${esc(labels[i])}：${f1(v)}</title></circle>`})});
+  labels.forEach((l,i)=>{const[x,y]=pt(i,LR),c=Math.cos(-Math.PI/2+2*Math.PI*i/N),an=c>.3?'start':c<-.3?'end':'middle';
+    s+=`<text x="${x}" y="${y+4}" text-anchor="${an}">${esc(l)}</text>`});
+  return s+'</svg>'}
+function hbar(label,val,max,color,right,sub){return `<div>${label}${sub?`<div class="sub">${sub}</div>`:''}</div><div class="trk" role="img" aria-label="${esc(label)} ${val==null?'—':f1(val)}点"><i style="width:${val==null?0:Math.max(0,Math.min(100,val/max*100))}%;background:${color}"></i></div><div class="val">${right}</div>`}
+
+function tabGraph(m,b,mode){
+  const self=mode==='self',showBoss=!self||m.published,E=m.seikaIn;
+  const NOSEIKA='<div class="box"><b>成果</b><p class="note">'+(m.kind==='part'?'アルバイトは、行動だけで評価します。':'成果の数字はまだ入っていません。「成果」タブで数字を入れると、ここにグラフが出ます。')+'</p></div>';
+  const t=tantoP(m),mv=movedP(m),dc=decidedP(m),ra=ratesAvg(m),ep=eigyoP(m),kp=kanriP(m),sk=seika(m),r=RATIO[m.grade],k=koudou(m),tt=total(m);
+  const rm=S.rmode||'group',its=items(m.grade);
+  const labels=rm==='group'?grpAvg(m,m.self).labels:its.map((it,i)=>(i+1)+' '+it);
+  const sv=rm==='group'?grpAvg(m,m.self).vals:its.map(i=>m.self[i]??null);
+  const bv=rm==='group'?grpAvg(m,m.boss).vals:its.map(i=>(m.boss[i]===''?null:m.boss[i])??null);
+  const series=[{name:'自己評価',vals:sv,color:'var(--ok)',dash:true}];if(showBoss)series.push({name:'管理者の評価',vals:bv,color:'var(--accent)'});
+  const mixTotal=m.mix.tanto+m.mix.eigyo+m.mix.kanri;
+  b.innerHTML=`
+  <div class="grid2" style="margin-top:12px">
+    ${!E?NOSEIKA:m.kind==='local'?localBars(m):`<div class="box"><div class="box-h"><b>成果：どの仕事で点を取ったか</b><span class="score">${f1(sk)}<small> / 5</small></span></div>
+      <div class="hbar">
+        ${hbar('担当',t.p,5,'var(--accent)',t.p+'点 × '+m.mix.tanto+'%','担当の量 '+t.q.toFixed(2))}
+        ${hbar('営業',m.mix.eigyo?ep:null,5,'var(--ok)',(m.mix.eigyo?f1(ep):'—')+'点 × '+m.mix.eigyo+'%',m.mix.eigyo?'':'割合0%')}
+        ${hbar('管理',kp,5,'var(--warn)',kp+'点 × '+m.mix.kanri+'%','改善 '+m.kaizen+'件')}
+      </div>
+      <p class="note">棒の長さ＝点（5点満点）。右は「点 × 仕事の割合」。仕事の割合：担当${m.mix.tanto}%／営業${m.mix.eigyo}%／管理${m.mix.kanri}%${mixTotal!==100?'（合計が100%ではありません）':''}</p>
+      ${m.mix.eigyo?`<h3>営業の内訳（動いた数40%・確率30%・決まった数30%）</h3>
+      <div class="hbar">
+        ${hbar('動いた数',mv.p,5,'var(--ok)',mv.p+'点',mv.r==null?'目標なし':m.moved.a+'社 / 目標'+m.moved.t+'社')}
+        ${hbar('確率',ra,5,'var(--ok)',f1(ra)+'点','求人・決定の獲得率（4つの平均）')}
+        ${hbar('決まった数',dc.p,5,'var(--ok)',dc.p+'点',m.decided+'件（全社の標準 '+STD.decided+'件）')}
+      </div>`:''}
+    </div>`}
+    <div class="box"><div class="box-h"><b>総合：成果と行動の合わせ方</b><span><span class="score">${tt==null?'—':f1(tt)}</span> <span class="rank r-${rank(tt,m.cap)}" style="vertical-align:middle">${rank(tt,m.cap)}</span></span></div>
+      <div class="stack" role="img" aria-label="総合点の内訳"><i style="width:${tt==null?0:sk*r/5*100}%;background:var(--accent)"></i><i style="width:${tt==null?0:k.a*(1-r)/5*100}%;background:var(--ok)"></i></div>
+      <div class="legend"><span style="--c:var(--accent)">成果 ${fx(sk)} × ${Math.round(r*100)}% ＝ ${sk==null?'—':f1(sk*r)}</span><span style="--c:var(--ok)">行動 ${k.a==null?'—':f1(k.a)} × ${Math.round((1-r)*100)}% ＝ ${k.a==null?'—':f1(k.a*(1-r))}</span></div>
+      <p class="note">全体の長さ＝5点満点。${gl(m)}は成果${Math.round(r*100)}：行動${Math.round((1-r)*100)}。S 4.5以上／A 3.7〜／B 2.8〜／C 2.0〜／D 2.0未満${m.cap?'。今期は上限Bです':''}</p>
+      ${self&&!m.published?'<p class="note">総合点とランクは、結果が公開されると見られます。</p>':''}
+    </div>
+  </div>
+
+  <div class="box" style="margin-top:14px">
+    <div class="box-h"><b>行動：レーダーチャート（中心＝0、外側＝5点）</b>
+      <div class="seg" role="group" aria-label="表示の切り替え"><button type="button" data-rm="group" aria-pressed="${rm==='group'}">4つの分類</button><button type="button" data-rm="item" aria-pressed="${rm==='item'}">項目ごと（${its.length}）</button></div></div>
+    ${radarSVG(labels,series)}
+    <div class="legend" style="justify-content:center"><span style="--c:var(--ok)">自己評価${sv.some(v=>v!=null)?'':'（未入力）'}</span>${showBoss?`<span style="--c:var(--accent)">管理者の評価</span>`:''}<span style="--c:var(--sub)">点線の輪＝3点（期待どおり）</span></div>
+    <p class="note" style="text-align:center">${rm==='group'?'分類ごとの項目の平均点です。':'番号は行動の項目の番号です。'}未入力の項目は中心（0）に表示されます。${self&&!m.published?'管理者の評価は、結果の公開後に重ねて表示されます。':'自己評価と管理者の評価が離れている方向が、フィードバックで話し合うところです。'}</p>
+  </div>`;
+  b.querySelectorAll('[data-rm]').forEach(x=>x.addEventListener('click',()=>{S.rmode=x.dataset.rm;save();render()}));
+}
+
+/* ---------- 本人の画面 ---------- */
+function renderSelf(mid){
+  const m=S.m[mid],its=items(m.grade),filled=its.filter(k=>m.self[k]!=null).length,lockd=m.submitted||myRank()<2,st=statusOf(m);
+  const tabs=[['graph','グラフ'],['self','自己評価'],['seika','成果'],['fb','結果とフィードバック']];
+  app.innerHTML=`
+  <section class="hpanel">
+    <div class="head"><h1>わたしの評価　<span class="muted">${esc(m.name)}／${gl(m)}／${esc(m.dept)}</span></h1><span class="pill ${st[1]}">${st[0]}</span></div>
+    ${flowHTML('self')}
+    <p class="note">本人の画面では、自分の評価だけが見られます。${myRank()>=2?'管理者は、本人から聞いた自己評価とエピソードを、ここで代わりに入力できます。':''}</p>
+    <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" type="button" data-stab="${k}" aria-selected="${S.stab===k}">${l}</button>`).join('')}</div>
+    <div id="sbody"></div>
+  </section>`;
+  app.querySelectorAll('[data-stab]').forEach(t=>t.addEventListener('click',()=>{S.stab=t.dataset.stab;save();render()}));
+  bindFlow('self');
+  const b=document.getElementById('sbody');
+  if(S.stab==='graph'){tabGraph(m,b,'self');return}
+  if(S.stab==='seika'){tabSeika(m,b,false);b.insertAdjacentHTML('afterbegin','<p class="note" style="margin-top:10px">成果の数字は管理者が入力します。違っていると思ったら、評価者に相談してください。</p>');return}
+  if(S.stab==='fb'){
+    if(!m.published){b.innerHTML=`<div class="lock"><b>まだ公開されていません</b><p class="muted">代表の査定が終わると、総合点・ランク・評価者からのフィードバックがここに表示されます（1/15ごろ）。</p></div>`;return}
+    const t=total(m),rk=rank(t,m.cap),k=koudou(m);
+    b.innerHTML=`<div class="grid2" style="margin-top:10px">
+      <div class="box"><div class="box-h"><b>総合</b><span><span class="score">${t==null?'—':f1(t)}</span> <span class="rank r-${rk}" style="vertical-align:middle">${rk}</span></span></div>
+        <dl class="kv"><dt>成果点</dt><dd>${fx(seika(m))}</dd><dt>行動点（管理者の評価）</dt><dd>${k.a==null?'—':f1(k.a)}</dd><dt>自己評価の平均</dt><dd>${avg(m.self).a==null?'—':f1(avg(m.self).a)}</dd></dl>
+        ${m.cap?'<div class="warnline">今期は記録簿の未記入放置・届出漏れ・個人情報の事故のいずれかがあったため、ランクの上限がBになっています。</div>':''}</div>
+      <div class="box"><b>${leadName(m)}からのフィードバック</b><p style="margin:8px 0 0;white-space:pre-wrap">${esc(m.fb)||'<span class="muted">まだ記入されていません</span>'}</p></div></div>
+      <div class="tw" style="margin-top:12px"><table><thead><tr><th>項目</th><th class="n">自己評価</th><th class="n">管理者の評価</th><th>管理者からのメモ</th></tr></thead><tbody>
+      ${its.map((it,j)=>`<tr><td><span class="ino">${j+1}</span>${esc(it)}</td><td class="n">${m.self[it]??'—'}</td><td class="n">${m.boss[it]??'—'}</td>
+        <td class="ep"><div class="epread">${m.memoPub[it]&&m.memo[it]?esc(m.memo[it]):'<span class="muted">—</span>'}</div></td></tr>`).join('')}</tbody></table></div>
+      <p class="note">管理者の評価の点数は、すべての項目で見られます。管理者からのメモは、管理者が公表を選んだ項目だけ表示されます。</p>`;
+    return}
+  b.innerHTML=`
+  <p class="note" style="margin-top:10px">各項目を、自分の等級に期待される水準と比べて1〜5点で選びます。「5点〜1点の姿」を開くと目安が見られます。休暇の回数や長さは点になりません。</p>
+  <div class="cards"><div class="card"><span>入力した項目</span><b>${filled} / ${its.length}</b></div><div class="card"><span>自己評価の平均</span><b>${avg(m.self).a==null?'—':f1(avg(m.self).a)}</b></div><div class="card"><span>締切</span><b>12/15</b><small>提出すると修正できません</small></div></div>
+  <div class="tw" style="margin-top:12px"><table><thead><tr><th>項目</th><th>具体的なエピソード（自由記入）</th><th class="n">自己評価</th></tr></thead><tbody>
+  ${(()=>{let i=0;const row=it=>{const D=DESC[it],j=i++;return `<tr><td class="item"><div class="iname"><span class="ino">${j+1}</span>${esc(it)}${NEW.has(it)?'<span class="new">新</span>':''}</div>
+    ${D?`<div class="idesc">${esc(D[0])}</div><details><summary>5点〜1点の姿</summary><dl class="lv">${[5,4,3,2,1].map((p,x)=>`<dt>${p}点</dt><dd>${esc(D[x+1])}</dd>`).join('')}</dl></details>`:''}</td>
+    <td class="ep"><textarea class="sm" id="ep-${j}" aria-label="${esc(it)}の具体的なエピソード" placeholder="例：いつ、何をして、どうなったか" ${lockd?'disabled':''}>${esc(m.ep[it]||'')}</textarea></td>
+    <td class="n">${scoreSel('ss-'+j,m.self[it],lockd)}</td></tr>`};
+    const ex=EXTRA[m.grade]||[];
+    return BEHAVIOR.map(g=>`<tr><th colspan="3">${g.g}</th></tr>`+g.items.map(row).join('')).join('')+(ex.length?`<tr><th colspan="3">${gl(m)}で増える項目</th></tr>`+ex.map(row).join(''):'')})()}
+  </tbody></table></div>
+  <div class="addrow">${lockd?'<span class="pill p-acc">提出済み</span><span class="muted">修正したいときは、評価者に差し戻しをお願いしてください。</span>'
+    :`<button class="btn primary" type="button" id="submit" ${filled<its.length?'disabled':''}>自己評価を提出する</button><span class="muted">${filled<its.length?'すべての項目を選ぶと提出できます（あと'+(its.length-filled)+'項目）':'提出すると、管理者の評価に進みます'}</span>`}</div>`;
+  its.forEach((it,j)=>{const e=document.getElementById('ss-'+j);if(e)e.addEventListener('change',()=>{m.self[it]=e.value===''?null:+e.value;save();render()});
+    const ep=document.getElementById('ep-'+j);if(ep)ep.addEventListener('change',()=>{m.ep[it]=ep.value;save()})});
+  const sbm=document.getElementById('submit');if(sbm)sbm.addEventListener('click',()=>{m.submitted=true;save();render()});
+}
+
+
+/* ---------- 対象者の設定（管理者） ---------- */
+function renderSettings(){
+  const emps=data.employees.filter(e=>e.status==='在籍').sort((a,b)=>(b.evalTarget?1:0)-(a.evalTarget?1:0)||String(a.empNo||'zzz').localeCompare(String(b.empNo||'zzz')));
+  const leads=emps.filter(e=>e.evalTarget);
+  app.innerHTML=`<section class="hpanel"><h2>対象者の設定</h2>
+    <p class="note">人事評価をする人にチェックを入れ、等級と評価者を選びます。チェックのない人（他部署・ご家族など）は、評価の一覧に出ません。変更はすぐに保存されます。</p>
+    <div class="tw" style="margin-top:10px"><table><thead><tr><th>対象</th><th>名前</th><th>部署・役職</th><th>等級</th><th>評価者</th></tr></thead><tbody>
+    ${emps.map(e=>`<tr><td><input type="checkbox" data-t="${e.id}" aria-label="${esc(empName(e.id))}を評価の対象にする" ${e.evalTarget?'checked':''}></td>
+      <td class="name">${esc(empName(e.id))}</td><td>${esc([e.department,e.position].filter(Boolean).join('／')||'—')}</td>
+      <td><select class="sc" data-g="${e.id}" aria-label="等級" ${e.evalTarget?'':'disabled'}>${GRADE_OPTS.map(g=>`<option value="${g}" ${(e.grade||'')===g?'selected':''}>${g||'未設定'}</option>`).join('')}</select></td>
+      <td><select class="sc" data-l="${e.id}" aria-label="評価者" ${e.evalTarget?'':'disabled'}><option value="">未設定</option><option value="代表" ${e.evalLead==='代表'?'selected':''}>代表</option>${leads.filter(x=>x.id!==e.id).map(x=>`<option value="${x.id}" ${e.evalLead===x.id?'selected':''}>${esc(empName(x.id))}</option>`).join('')}</select></td></tr>`).join('')}
+    </tbody></table></div>
+    <p class="note">等級「現地」＝現地スタッフ（成果は動いた数・確率・決まった数、同僚の評価あり）。「アルバイト」＝行動だけで評価。現地スタッフが一覧にいないときは、先に「従業員・人事情報」で登録してください。</p></section>`;
+  const upd=async(id,patch,dbp)=>{const e=empById(id);if(!e)return;Object.assign(e,patch);try{await q(sb.from('employees').update(dbp).eq('id',id))}catch(x){}flush();build();shell();render()};
+  app.querySelectorAll('[data-t]').forEach(c=>c.addEventListener('change',()=>upd(c.dataset.t,{evalTarget:c.checked},{eval_target:c.checked})));
+  app.querySelectorAll('[data-g]').forEach(c=>c.addEventListener('change',()=>upd(c.dataset.g,{grade:c.value},{grade:c.value})));
+  app.querySelectorAll('[data-l]').forEach(c=>c.addEventListener('change',()=>upd(c.dataset.l,{evalLead:c.value},{eval_lead:c.value})));
+}
+
+/* ---------- 画面の枠（期・表示の切り替え） ---------- */
+function shell(){
+  const adm=myRank()>=2,ps=[...new Set(data.evaluations.map(v=>v.period).filter(Boolean).concat(S.period))].sort();
+  root.innerHTML=`<div class="hy-top">
+    <b class="hy-title">評価管理</b>
+    <label class="muted" for="hy-period">期</label><select class="sc" id="hy-period">${ps.map(p=>`<option ${p===S.period?'selected':''}>${esc(p)}</option>`).join('')}</select>
+    ${adm?'<button class="btn" type="button" id="hy-newp">＋ 期を追加</button>':''}
+    ${S.page==='settings'?'':'<label class="muted" for="hy-viewer">表示</label><select class="sc" id="hy-viewer"></select>'}
+    <span style="flex:1"></span><span class="muted" id="hy-saved"></span>
+    ${adm?`<button class="btn ${S.page==='settings'?'primary':''}" type="button" id="hy-set">${S.page==='settings'?'← 評価にもどる':'対象者の設定'}</button>`:''}
+  </div><div id="hy-app" class="hy-main"></div>`;
+  app=root.querySelector('#hy-app');
+  const vs=root.querySelector('#hy-viewer');
+  if(vs){vs.innerHTML=['管理する人','本人の画面'].map(g=>{const l=VIEWERS.filter(v=>v.grp===g);return l.length?`<optgroup label="${g}">${l.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')}</optgroup>`:''}).join('');
+    vs.value=S.viewer;vs.addEventListener('change',()=>{S.viewer=vs.value;render()})}
+  root.querySelector('#hy-period').addEventListener('change',e=>{flush();S.period=e.target.value;build();shell();render()});
+  const np=root.querySelector('#hy-newp');if(np)np.addEventListener('click',()=>{const p=(prompt('新しい期の名前を入力してください（例：2027上期）')||'').trim();if(!p)return;flush();S.period=p;build();shell();render()});
+  const st=root.querySelector('#hy-set');if(st)st.addEventListener('click',()=>{flush();S.page=S.page==='settings'?'hyoka':'settings';build();shell();render()});
+}
+function syncTop(){const vs=root&&root.querySelector('#hy-viewer');if(vs)vs.value=S.viewer}
+function mount(el){
+  flush();root=el;
+  if(!S.period){const ps=[...new Set(data.evaluations.map(v=>v.period).filter(Boolean))].sort();S.period=ps[ps.length-1]||'2026下期'}
+  build();shell();render();
+}
+/* ほかの画面（タレントなど）から、新しい形のシートの点とランクを出す */
+function calc(v){const e=empById(v.empId);if(!e)return null;const m=memberFrom(e,v),t=total(m);return{seika:seika(m),koudou:koudou(m).a,total:t,rank:rank(t,m.cap)}}
+return {mount,calc};
+})();
+
 boot();
 </script>
 </body>

@@ -85,6 +85,10 @@ alter table public.employees add column if not exists address_since date;
 -- パスポートの発行機関、本人資料（Googleドライブ）のリンク（2026-10-29）
 alter table public.employees add column if not exists passport_issuer   text default '';
 alter table public.employees add column if not exists personal_docs_url text default '';
+-- 人事評価（新制度 2026）：対象者・等級・評価者（2026-11-26）。等級は 1/2/3/4M/4S/5/現地/アルバイト、評価者は「代表」または従業員のid
+alter table public.employees add column if not exists eval_target boolean not null default false;
+alter table public.employees add column if not exists grade       text default '';
+alter table public.employees add column if not exists eval_lead   text default '';
 
 -- 企業情報（1行だけ持つ表）。閲覧は社員以上、編集は管理者以上（licenses と同じ権限）（2026-10-29）
 -- 法人番号・雇用保険適用事業所番号の値は、画面の「企業情報」から入力する（リポジトリは公開のため、ここには書かない）
@@ -144,6 +148,9 @@ create table if not exists public.evaluations (
 
 -- 退職者数のように「少ないほど良い」KPIを正しく評価するための区分
 -- （達成率を 目標÷実績 で計算する）
+-- 新しい形の評価シート（等級×成果×行動）の中身。v:2 が入っていれば新しい形
+alter table public.evaluations add column if not exists sheet jsonb not null default '{}'::jsonb;
+
 create table if not exists public.kpis (
   id          uuid primary key default gen_random_uuid(),
   period      text default '',
