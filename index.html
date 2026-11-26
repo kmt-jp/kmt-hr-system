@@ -1518,7 +1518,7 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20261126.54';
+const APP_VER = 'ver.20261126.55';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
   {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
@@ -6710,12 +6710,12 @@ sb.auth.onAuthStateChange((event, s)=>{
    インセンティブの計算は、ここにはまだ入れていない。 */
 const Hyoka=(function(){
 const BEHAVIOR=[
-  {g:'仕事の進め方',items:['報連相','正確性・期限','スピード・優先順位','タスク管理・確認']},
+  {g:'業務・タスク管理',items:['報連相・引継ぎ','正確性','スピード・期限','やり遂げる力','記録・アラート対応','共有事項の確認']},
   {g:'人への対応',items:['企業への対応','人材への対応','チーム貢献']},
   {g:'規律・自己管理',items:['誠実さ・規律','勤怠・自己管理','届出：出張・経費']},
   {g:'成長・改善',items:['改善・工夫','提案・発言','挑戦・学習']}
 ];
-const NEW=new Set(['タスク管理・確認','勤怠・自己管理','届出：出張・経費','提案・発言']);
+const NEW=new Set(['やり遂げる力','記録・アラート対応','共有事項の確認','勤怠・自己管理','届出：出張・経費','提案・発言']);
 const EXTRA={'3':['チーム管理','育成'],'4M':['チーム管理','育成','複数チーム管理、判断と評価'],'4S':['分野の責任'],'5':['方針と全体']};
 const RATIO={'5':.8,'4M':.7,'4S':.7,'3':.6,'2':.5,'1':.3,'L':.5,'P':0};
 const gl=m=>m.grade==='L'?'現地スタッフ':m.grade==='P'?'アルバイト':'等級'+m.grade;
@@ -6723,30 +6723,42 @@ const STD={newJob:.20,oldJob:.40,newDec:.30,oldDec:.35,decided:6};
 const RATE_LABEL={newJob:'求人の獲得率（新規企業）',oldJob:'求人の獲得率（既存企業）',newDec:'決定の獲得率（新規企業）',oldDec:'決定の獲得率（既存企業）'};
 /* [説明, 5点, 4点, 3点, 2点, 1点] */
 const DESC={
- '報連相':['決まったこと・問題・進み具合を、必要な人に、早めに、正しく伝える',
-   '言われる前に共有し、悪い知らせほど早く相談する。周りが動きやすい伝え方をする',
-   '言われる前に報告・相談できる。伝える内容もまとまっている',
-   '必要なことを、期限までに報告・連絡・相談できる',
-   'ときどき報告が遅れる、または必要な人に伝わっていないことがある',
-   '報告がない、遅い、聞かれるまで言わないことが多い'],
- '正確性・期限':['書類・入力・申請を、間違いなく、期限までに終える',
-   'ミスがほとんどなく、期限より前に終える。自分で見直しの仕組みを作っている',
-   'ミスが少なく、期限より前に終えることが多い',
-   'ミスはまれで、期限を守る',
-   'ときどきミスや期限ぎりぎり・遅れがあり、直しが必要になる',
-   'ミスや期限切れを繰り返し、やり直しが多い'],
- 'スピード・優先順位':['急ぐもの・大事なものから手を付け、早く動く',
-   '急ぎと大事を見分けてすぐに動く。周りの仕事の順番も考えられる',
-   '急ぎの仕事にすぐ取りかかり、決められた時間より早く終えることが多い',
-   '優先順位をつけて、決められた時間内に終える',
-   'ときどき順番を間違えたり、急ぎの仕事が遅れたりする',
-   '後回しが多く、急ぎの仕事が遅れる'],
- 'タスク管理・確認':['頼まれたことを自分で管理し、社内の共有事項を確認して実行する',
-   '頼まれたことを自分で管理し、抜けがない。遅れそうなら前もって相談',
-   '頼まれたことを忘れず、催促なしで終える。社内共有も自分から確認している',
-   '頼まれたことを忘れず対応し、遅れるときは報告する。社内共有を確認して実行',
-   'ときどき頼まれたことを忘れたり、共有事項を見落としたりして、催促が必要になる',
-   '頼まれたことを忘れる。遅れても報告がない。失念のミスを繰り返す'],
+ '報連相・引継ぎ':['決まったこと・問題・進み具合を、必要な人に早めに伝える。できない仕事は早めに報告し、引継ぎや振り分けをする',
+   '言われる前に共有し、悪い知らせほど早く相談する。できない仕事は自分から引継ぎ・振り分けを提案し、抜けなく渡す',
+   '言われる前に報告・相談できる。できない仕事は早めに伝え、引継ぎもできている',
+   '必要なことを期限までに報告・連絡・相談できる。できないときは報告し、引継ぎをする',
+   'ときどき報告が遅れる。できない仕事を抱えたままで、引継ぎが遅れることがある',
+   '報告がない、遅い。できない仕事を言わずに止めてしまう'],
+ '正確性':['書類・入力・申請などを、間違いなく行う',
+   'ミスがほとんどなく、自分で見直しの仕組みを作っている',
+   'ミスが少なく、見直しを習慣にしている',
+   'ミスはまれで、あっても自分で気づいて直せる',
+   'ときどきミスがあり、人に直してもらうことがある',
+   '同じミスを繰り返し、やり直しが多い'],
+ 'スピード・期限':['急ぐもの・大事なものから手を付け、迅速に、期限どおりに終える',
+   '急ぎと大事を見分けてすぐに動き、期限より前に終える。周りの仕事の順番も考えられる',
+   '急ぎの仕事にすぐ取りかかり、期限より前に終えることが多い',
+   '優先順位をつけて、期限どおりに終える',
+   'ときどき期限ぎりぎり・遅れがある',
+   '後回しが多く、期限を守れないことが多い'],
+ 'やり遂げる力':['任された業務を、途中で止めずに最後までやり遂げる',
+   '難しい仕事も自分で工夫して最後までやり遂げ、結果まで報告する',
+   '任された仕事を、催促なしで最後までやり遂げる',
+   '任された仕事を、最後までやり遂げる',
+   'ときどき途中で止まり、催促が必要になる',
+   '途中で投げ出す、または放置することがある'],
+ '記録・アラート対応':['担当案件の記録をきちんと残し、システムのリマインドやアラートに対応する',
+   '記録がいつも最新で、アラートが出る前に先回りして対応している',
+   '記録が早く正確で、アラートやリマインドにもすぐ対応している',
+   '記録を期限までに残し、アラートやリマインドに対応している',
+   'ときどき記録の遅れや、アラート・リマインドの放置がある',
+   '記録の未記入や、アラートの放置が多い'],
+ '共有事項の確認':['MTG・グループ・システムからの共有事項に目を通し、理解して行動する',
+   '共有事項をすぐに理解して動き、分かりにくい点は自分から確認して周りにも伝える',
+   '共有事項を早めに確認し、内容を理解して行動している',
+   '共有事項に目を通し、内容を理解して行動している',
+   'ときどき見落としがあり、同じことを何度も聞くことがある',
+   '共有事項を読まず、見落としを繰り返す'],
  '企業への対応':['企業の担当者との連絡、要望やトラブルへの対応、信頼関係づくり',
    '企業から信頼され、要望の先回りや改善の提案ができる',
    '企業の要望に早く丁寧に応え、企業から名前を挙げて頼られることがある',
@@ -6769,7 +6781,7 @@ const DESC={
    'ルールを守るだけでなく、周りの手本になっている',
    'ルールを守り、勤務時間内はいつでも連絡が取れる。連絡が取れない予定はカレンダーに入れている',
    'ルールを守り、ミスも正直に報告する。勤務時間内は業務に集中している',
-   'ときどき勤務時間内に連絡が取れない、共有事項を何度も聞き直すなどがある',
+   'ときどき勤務時間内に連絡が取れないことがある',
    'ルール違反やごまかしがある。勤務時間内に連絡が取れないことが多い'],
  '勤怠・自己管理':['遅刻・早退・打刻ミスをしない。休暇は申請・報告・引継ぎをルールどおり行う（休暇の回数や長さでは点にしない）',
    '遅刻・早退・打刻ミスがない。休暇は早めに申請し、引継ぎも整える',
@@ -6868,7 +6880,7 @@ function build(){
   S.m={};
   data.employees.filter(e=>e.status==='在籍'&&e.evalTarget)
     .sort((a,b)=>GORDER.indexOf(GCODE(a.grade))-GORDER.indexOf(GCODE(b.grade))||String(a.empNo||'zzz').localeCompare(String(b.empNo||'zzz')))
-    .forEach(e=>{const ev=data.evaluations.find(v=>v.empId===e.id&&v.period===S.period);const m=memberFrom(e,ev);S.m[e.id]=m;snap[e.id]=JSON.stringify(sheetOf(m))});
+    .forEach(e=>{const ev=data.evaluations.find(v=>v.empId===e.id&&v.period===S.period&&!isLegacy(v));const m=memberFrom(e,ev);S.m[e.id]=m;snap[e.id]=JSON.stringify(sheetOf(m))});
   const ids=Object.keys(S.m),adm=myRank()>=2,me=myEmpId();
   VIEWERS=(adm?[{id:'admin',name:'管理者の画面',role:'admin',grp:'管理する人'}]:[])
     .concat(ids.filter(id=>adm||id===me).map(id=>({id:'self-'+id,name:S.m[id].name+'（本人の画面）',role:'self',mid:id,grp:'本人の画面'})));
@@ -6887,7 +6899,7 @@ async function persist(mm,period){
     const m=mm[id],sheet=sheetOf(m),js=JSON.stringify(sheet);
     if(snap[id]===js)continue;
     const st=m.published?'確定':m.submitted?'上長評価中':avg(m.self).n?'自己評価中':'目標設定';
-    let ev=data.evaluations.find(v=>v.empId===id&&v.period===period);
+    let ev=data.evaluations.find(v=>v.empId===id&&v.period===period&&!isLegacy(v));
     const prev=snap[id];snap[id]=js;
     try{
       if(!ev){ev=newEvalObj(id,period);ev.sheet=sheet;ev.status=st;data.evaluations.push(ev);await q(sb.from('evaluations').insert(evalToDb(ev)))}
@@ -6981,24 +6993,38 @@ function render(){
       <td><span class="rank r-${r}">${r}</span>${m.cap?' <span class="pill p-warn">上限B</span>':''}</td>
       <td><span class="pill ${statusOf(m)[1]}">${statusOf(m)[0]}</span></td></tr>`}).join('')}</tbody></table></div>
   </section>
-  <section class="hpanel" id="detail"></section>`;
+  <section class="hpanel" id="detail"></section>
+  ${pastLegacyHtml()}`;
   document.querySelectorAll('#list tbody tr').forEach(tr=>{
     const go=()=>{S.sel=tr.dataset.id;save();render()};
     tr.addEventListener('click',go);tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}})});
   bindFlow('admin');
   renderDetail();
+  bindPast();
 }
 
+function pastLegacyHtml(){
+  const ids=[...new Set(data.evaluations.filter(isLegacy).map(v=>v.empId))].filter(id=>!S.m[id]);
+  if(!ids.length)return '';
+  return `<section class="hpanel"><h2>評価の対象外の人の、前の評価（参考）</h2>
+    <p class="note">退職した人など、今の評価の対象ではない人の、前の形の評価シートです。</p>
+    <div class="addrow">${ids.map(id=>`<button class="btn ${S.past===id?'primary':''}" type="button" data-past="${id}">${esc(empName(id))}</button>`).join('')}</div>
+    ${S.past&&ids.includes(S.past)?'<div id="pastbody"></div>':''}</section>`}
+function bindPast(){
+  document.querySelectorAll('[data-past]').forEach(b=>b.addEventListener('click',()=>{S.past=S.past===b.dataset.past?null:b.dataset.past;render()}));
+  const pb=document.getElementById('pastbody');if(pb)tabLegacy(S.past,pb,null);
+}
 function renderDetail(){
   const m=S.m[S.sel],el=document.getElementById('detail'),ed=canEditAny(m);
-  const tabs=[['graph','グラフで見る'],['seika','成果'],['koudou','行動'],['sougou','総合・フィードバック']];
+  const tabs=[['graph','グラフで見る'],['seika','成果'],['koudou','行動'],['sougou','総合・フィードバック']].concat(legacyOf(m.id).length?[['legacy','前の評価（参考）']]:[]);
+  if(S.tab==='legacy'&&!legacyOf(m.id).length)S.tab='graph';
   el.innerHTML=`<div class="head"><div><h2 style="margin:0">${esc(m.name)}　<span class="muted">${gl(m)}／${esc(m.dept)}${m.title?'　'+esc(m.title):''}／評価：${leadName(m)}</span></h2></div>
     ${ed?'<span class="pill p-acc">編集できます</span>':'<span class="pill p-soft">閲覧のみ</span>'}</div>
     <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button class="tab" role="tab" type="button" data-tab="${k}" aria-selected="${S.tab===k}">${l}</button>`).join('')}</div>
     <div id="tabbody"></div>`;
   el.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{S.tab=b.dataset.tab;save();renderDetail()}));
   const body=el.querySelector('#tabbody');
-  ({graph:(mm,bb)=>tabGraph(mm,bb,'admin'),seika:tabSeika,koudou:tabKoudou,sougou:tabSougou})[S.tab](m,body,ed);
+  ({graph:(mm,bb)=>tabGraph(mm,bb,'admin'),seika:tabSeika,koudou:tabKoudou,sougou:tabSougou,legacy:(mm,bb)=>tabLegacy(mm.id,bb,mm)})[S.tab](m,body,ed);
 }
 
 function num(id,val,dis){return `<input type="number" id="${id}" value="${val}" min="0" step="1" ${dis?'disabled':''}>`}
@@ -7146,6 +7172,71 @@ function tabSougou(m,b,ed){
   b.querySelector('#ceo').addEventListener('change',e=>{m.ceo=e.target.value;save()});
 }
 
+
+/* ---------- 前の形の評価シート（2026上期まで・Excel から取り込み）---------- */
+const isLegacy=v=>!!(v&&v.sheet&&v.sheet.v==='legacy');
+/* 前のシートの25問（分類・質問）。items は [質問の番号, 自己, チーム, 上司, エピソード] で持つ */
+const LEGACY_Q=[["成長意欲", "常に志高く、熱意をもって仕事に取り組んでいるか"], ["成長意欲", "会社のステージごとに自ら積極的に変化し続けているか"], ["成長意欲", "自らの目標に対し、業務に向かえているか"], ["協調性", "上司・先輩などの上位者に対し、正確にホウレンソウ（報告・連絡・相談）をしているか"], ["協調性", "職場の同僚等と本音で話し合える人間関係を構築しているか"], ["協調性", "会社の成長に向けて、主体的な動きができているか"], ["協調性", "自分の意見に固執せず、人の意見を受け入れ業務に活かせているか"], ["積極性", "余裕がある場合には、周囲の忙しそうな人の仕事を手伝っているか"], ["積極性", "未経験の仕事や難しい仕事でも「やらせてほしい」と自ら申し出ているか"], ["積極性", "上手くいかない仕事に対しても、原因をつきとめ、再チャレンジしているか"], ["知識・技能・技術", "業務タスクに優先順位をつけ、スピーディに対応できているか"], ["知識・技能・技術", "原因追及とともに、解決まで終始一貫して遂行できているか"], ["知識・技能・技術", "自分の役割に対し、最後まで責任をもってやり抜いているか"], ["知識・技能・技術", "自分の接客態度が自社への信頼や満足を大きく左右することを理解し、細心の注意でお客様と接しているか"], ["創意工夫力", "仕事に対する自身の目的意識や思いを持って、取り組んでいるか"], ["創意工夫力", "仕事について工夫や改善を行った内容を再度点検して、さらによいものにしているか"], ["理解・判断力", "上司・先輩などからの業務指示・命令の内容を理解して従っているか"], ["実行力", "必要な手続や手間を省くことなく、決められた手順どおり仕事を進めているか"], ["実行力", "お客様に納得・満足していただけるよう仕事に取り組んでいるか"], ["実行力", "次の課題を見据えながら、手がけている仕事に全力で取り組んでいるか"], ["規律・責任性", "出勤時間、約束時間などの定刻前に到着しているか。挨拶をしているか。"], ["規律・責任性", "社内の清掃や身の回りの整理・整頓など、環境を整えているか"], ["規律・責任性", "自分が犯した失敗やミスについて、他人に責任を押し付けず自分で受け止めているか"], ["規律・責任性", "一旦引き受けたことは途中で投げ出さずに、最後までやり遂げているか"], ["指導力", "職場の新人や下位者に対して業務指導や仕事のノウハウ提供をしているか"]];
+const legacyItems=sh=>(sh.items||[]).map(x=>Array.isArray(x)?{cat:LEGACY_Q[x[0]][0],q:LEGACY_Q[x[0]][1],self:x[1],team:x[2],boss:x[3],ep:x[4]||''}:x);
+const legacyOf=id=>data.evaluations.filter(v=>v.empId===id&&isLegacy(v)).sort((a,b)=>String(b.period).localeCompare(String(a.period)));
+/* 前の点（0〜5。3＝メンバーの見本、2＝行動できている）→ 今の点の目安（3＝期待どおり） */
+const oldToNew=x=>x==null?null:Math.min(5,x+1);
+/* 今の行動の項目 ← 前のシートの質問（文の一部で探す） */
+const OLD_MAP={
+ '報連相・引継ぎ':['ホウレンソウ'],
+ '正確性':['決められた手順どおり','原因追及とともに'],
+ 'スピード・期限':['優先順位をつけ'],
+ 'やり遂げる力':['最後まで責任をもって','最後までやり遂げて'],
+ '記録・アラート対応':[],
+ '共有事項の確認':['業務指示・命令の内容を理解'],
+ '企業への対応':['接客態度','お客様に納得'],
+ '人材への対応':[],
+ 'チーム貢献':['忙しそうな人','本音で話し合える','人の意見を受け入れ'],
+ '誠実さ・規律':['他人に責任を押し付けず'],
+ '勤怠・自己管理':['定刻前','整理・整頓'],
+ '届出：出張・経費':[],
+ '改善・工夫':['工夫や改善を行った','目的意識'],
+ '提案・発言':['主体的な動き'],
+ '挑戦・学習':['志高く','ステージごとに','自らの目標','未経験の仕事','再チャレンジ','次の課題'],
+ 'チーム管理':[],
+ '育成':['新人や下位者']
+};
+function oldAvg(list,key){const v=list.map(i=>i[key]).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null}
+function tabLegacy(id,b,m){
+  const L=legacyOf(id);if(!L.length){b.innerHTML='<p class="note">前の評価シートはありません。</p>';return}
+  const key='lp-'+id;if(!L.some(v=>v.period===S[key]))S[key]=L[0].period;
+  const ev=L.find(v=>v.period===S[key]),sh=ev.sheet,its=legacyItems(sh),team=its.some(i=>i.team!=null);
+  const a={self:oldAvg(its,'self'),team:oldAvg(its,'team'),boss:oldAvg(its,'boss')};
+  const card=(l,x)=>`<div class="card"><span>${l}</span><b>${fx(x)}</b><small>今の基準の目安：${fx(x==null?null:oldToNew(x))}</small></div>`;
+  const nowItems=m?items(m.grade):Object.keys(OLD_MAP);
+  const cmp=nowItems.map((it,n)=>{const qs=OLD_MAP[it]||[],hit=its.filter(i=>qs.some(q=>i.q.indexOf(q)>=0));
+    const ob=oldAvg(hit,'boss'),os=oldAvg(hit,'self'),nb=m&&m.boss[it]!=null&&m.boss[it]!==''?+m.boss[it]:null,base=ob!=null?oldToNew(ob):os!=null?oldToNew(os):null,d=nb!=null&&base!=null?nb-base:null;
+    return `<tr><td><span class="ino">${n+1}</span>${esc(it)}</td><td class="muted" style="font-size:12px">${hit.length?hit.map(i=>esc(i.q)).join('<br>'):'前のシートに近い項目なし'}</td>
+      <td class="n">${fx(os)}</td><td class="n">${fx(ob)}</td><td class="n"><b>${fx(base)}</b></td>${m?`<td class="n">${nb==null?'—':nb}</td><td class="n">${d==null?'':d>0?'<span class="diff-up">+'+f1(d)+'</span>':d<0?'<span class="diff-down">'+f1(d)+'</span>':'0'}</td>`:''}</tr>`}).join('');
+  let cat='';
+  const full=its.map((i,n)=>{const head=i.cat&&i.cat!==cat?(cat=i.cat,`<tr><th colspan="${team?5:4}">${esc(i.cat)}</th></tr>`):'';
+    return head+`<tr><td>${esc(i.q)}${i.ep?`<div class="idesc">${esc(i.ep)}</div>`:''}</td><td class="n">${fx(i.self)}</td>${team?`<td class="n">${fx(i.team)}</td>`:''}<td class="n">${fx(i.boss)}</td><td class="n">${fx(oldToNew(i.boss!=null?i.boss:null))}</td></tr>`}).join('');
+  const txt=(t,body)=>body?`<div class="box" style="margin-top:12px"><b>${t}</b><div class="epread" style="margin-top:6px">${esc(body)}</div></div>`:'';
+  const parts=o=>o&&o.parts?o.parts.filter(p=>p.body).map(p=>(p.title?'【'+p.title+'】\n':'')+p.body).join('\n\n'):'';
+  const hr=sh.hearing&&Object.keys(sh.hearing).length?Object.entries(sh.hearing).filter(([k])=>k!=='氏名'&&k!=='面談日').map(([k,v])=>'【'+k+'】'+v).join('\n'):'';
+  b.innerHTML=`
+  <div class="addrow" style="margin-top:10px"><label class="muted" for="lp-sel">期</label><select class="sc" id="lp-sel">${L.map(v=>`<option ${v.period===S[key]?'selected':''}>${esc(v.period)}</option>`).join('')}</select>
+    <span class="muted">前の形のシート（${esc(sh.label||'')}）。見るだけです。${sh.note?esc(sh.note):''}</span></div>
+  <div class="warnline" style="background:var(--soft);color:var(--fg)">前のシートは点の付け方が違います（0〜5点、<b>3＝メンバーの見本</b>、2＝行動できている）。今は<b>3＝期待どおり</b>なので、比べるときは前の点に1を足した「今の基準の目安」を使います（5が上限）。この換算は目安です。</div>
+  <div class="cards">${card('前の自己評価の平均',a.self)}${team?card('前のチーム評価の平均',a.team):''}${card('前の上司評価の平均',a.boss)}${m?`<div class="card"><span>今の行動点（管理者の評価）</span><b>${fx(koudou(m).a)}</b><small>${esc(S.period)}</small></div>`:''}</div>
+  ${m?`<h3>今の項目と比べる</h3>
+  <div class="tw"><table><thead><tr><th>今の項目</th><th>前のシートで近い質問</th><th class="n">前・自己</th><th class="n">前・上司</th><th class="n">目安</th><th class="n">今・管理者</th><th class="n">差</th></tr></thead><tbody>${cmp}</tbody></table></div>
+  <p class="note">「目安」は前の上司評価（無いときは自己評価）に1を足した点です。差＝今の管理者の評価−目安。前のシートに近い質問がない項目（記録・アラート対応、届出など）は比べられません。</p>`:''}
+  <h3>前のシートの全項目</h3>
+  <div class="tw"><table><thead><tr><th>質問</th><th class="n">自己</th>${team?'<th class="n">チーム</th>':''}<th class="n">上司</th><th class="n">目安</th></tr></thead><tbody>${full}</tbody></table></div>
+  ${txt('昇給希望',sh.raise&&(sh.raise.amount||sh.raise.reason)?((sh.raise.amount?'希望額：'+sh.raise.amount+'\n':'')+(sh.raise.reason||'')):'')}
+  ${txt('目標シート'+(sh.goals&&sh.goals.date?'（'+sh.goals.date+'）':''),parts(sh.goals))}
+  ${txt('振り返り'+(sh.review&&sh.review.date?'（'+sh.review.date+'）':''),parts(sh.review))}
+  ${txt('個人面談ヒアリング',hr)}
+  <p class="note">元のファイル：${esc(sh.file||'')}</p>`;
+  b.querySelector('#lp-sel').addEventListener('change',e=>{S[key]=e.target.value;tabLegacy(id,b,m)});
+}
+
 /* ---------- グラフ ---------- */
 function grpAvg(m,src){
   const gs=BEHAVIOR.map(g=>({l:g.g,items:g.items})),ex=EXTRA[m.grade]||[];
@@ -7280,7 +7371,7 @@ function renderSettings(){
 
 /* ---------- 画面の枠（期・表示の切り替え） ---------- */
 function shell(){
-  const adm=myRank()>=2,ps=[...new Set(data.evaluations.map(v=>v.period).filter(Boolean).concat(S.period))].sort();
+  const adm=myRank()>=2,ps=[...new Set(data.evaluations.filter(v=>!isLegacy(v)).map(v=>v.period).filter(Boolean).concat(S.period))].sort();
   root.innerHTML=`<div class="hy-top">
     <b class="hy-title">評価管理</b>
     <label class="muted" for="hy-period">期</label><select class="sc" id="hy-period">${ps.map(p=>`<option ${p===S.period?'selected':''}>${esc(p)}</option>`).join('')}</select>
@@ -7300,11 +7391,11 @@ function shell(){
 function syncTop(){const vs=root&&root.querySelector('#hy-viewer');if(vs)vs.value=S.viewer}
 function mount(el){
   flush();root=el;
-  if(!S.period){const ps=[...new Set(data.evaluations.map(v=>v.period).filter(Boolean))].sort();S.period=ps[ps.length-1]||'2026下期'}
+  if(!S.period){const ps=[...new Set(data.evaluations.filter(v=>!isLegacy(v)).map(v=>v.period).filter(Boolean))].sort();S.period=ps[ps.length-1]||'2026下期'}
   build();shell();render();
 }
 /* ほかの画面（タレントなど）から、新しい形のシートの点とランクを出す */
-function calc(v){const e=empById(v.empId);if(!e)return null;const m=memberFrom(e,v),t=total(m);return{seika:seika(m),koudou:koudou(m).a,total:t,rank:rank(t,m.cap)}}
+function calc(v){if(isLegacy(v))return null;const e=empById(v.empId);if(!e)return null;const m=memberFrom(e,v),t=total(m);return{seika:seika(m),koudou:koudou(m).a,total:t,rank:rank(t,m.cap)}}
 return {mount,calc};
 })();
 
