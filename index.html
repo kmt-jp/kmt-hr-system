@@ -1301,7 +1301,7 @@ async function reloadData(){
 const NAV = [
   ['company','企業情報',1],
   ['dashboard','ダッシュボード',0],
-  ['talent','タレント',1],
+  ['talent','社員情報',1],
   ['employees','従業員・人事情報',1],
   ['past','過去',1],
   ['docs','労務・書類管理',1],
@@ -1503,7 +1503,7 @@ function annCardHtml(){
   return `
   <div class="sb-ann">
     <div class="sb-ann-head">
-      <span>📢 アナウンス確認</span>
+      <span>アナウンス確認</span>
       ${unread? `<span class="cnt">${unread}</span>` : '<span class="cnt z">0</span>'}
       ${canEdit()? `<a href="javascript:openAnnForm()" title="お知らせを投稿">＋</a>`:''}
     </div>
@@ -1518,15 +1518,17 @@ function annCardHtml(){
 }
 
 /* ===== サイドバー（白×ターコイズ・メニューはパステル・グループ折りたたみ式） ===== */
-const APP_VER = 'ver.20261126.55';
+const APP_VER = 'ver.20261126.56';
 /* tone＝メニューのパステル色。:root の --g-*／--g-*-t と対になっている */
 const NAV_GROUPS = [
-  {key:'jinzai', label:'人材管理',   tone:'pink',  items:[['talent','👥','タレント'],['employees','🗂','従業員・人事情報'],['past','🗃','過去'],['selfing','🪞','SELFing'],['mental','💚','こころの健康'],['skills','🧭','スキル管理'],['evals','📝','評価管理']]},
-  {key:'romu',   label:'労務・書類', tone:'lilac', items:[['docs','📄','労務・書類管理'],['licenses','🏛','許可証管理'],['welfare','🎁','福利厚生'],['guide','📘','手続きガイド']]},
-  {key:'keiei',  label:'経営管理',   tone:'mint',  items:[['geppo','🗓','GLT月報'],['kpi','📈','KPI管理'],['assets','💼','資産管理']]},
-  {key:'system', label:'設定',       tone:'sky',   items:[['users','👤','ユーザー管理'],['data','⚙️','データ管理']]},
+  {key:'jinzai', label:'社員管理',   tone:'pink',  items:[['talent','社員情報'],['employees','従業員・人事情報'],['past','過去']]},
+  {key:'hyoka',  label:'評価制度',   tone:'pink',  items:[['evals','評価管理'],['skills','スキル管理'],['selfing','SELFing'],['mental','こころの健康']]},
+  {key:'romu',   label:'労務・書類', tone:'lilac', items:[['docs','労務・書類管理'],['licenses','許可証管理'],['welfare','福利厚生'],['guide','手続きガイド']]},
+  {key:'keiei',  label:'経営管理',   tone:'mint',  items:[['geppo','GLT月報'],['kpi','KPI管理'],['assets','資産管理']]},
+  {key:'system', label:'設定',       tone:'sky',   items:[['users','ユーザー管理'],['data','データ管理']]},
 ];
-let sbOpen = {jinzai:true, romu:true, keiei:true, system:false};
+const CIRC='①②③④⑤⑥⑦⑧⑨⑩';
+let sbOpen = {jinzai:true, hyoka:true, romu:true, keiei:true, system:false};
 function toggleGroup(k){ sbOpen[k]=!sbOpen[k]; renderNav(); }
 function goMyPage(){
   const id = myEmpId();
@@ -1545,18 +1547,19 @@ function renderNav(){
   const yel = alerts.filter(a=>a.level==='yellow').length;
   const alertTitle = myRank()>=2 ? '全体アラート' : '自分の担当のアラート';
 
+  let gno = 0;
   const groups = NAV_GROUPS.map(g=>{
     const items = g.items.filter(([k])=>navAllowed(k));
     if(!items.length) return '';
-    const open = sbOpen[g.key];
+    const open = sbOpen[g.key]; gno++;
     return `<div class="sb-group" style="--gc:var(--g-${g.tone});--gt:var(--g-${g.tone}-t)">
       <button onclick="toggleGroup('${g.key}')">
-        <span class="arrow">${open?'▼':'▶'}</span>${esc(g.label)}
+        <span class="arrow">${open?'▼':'▶'}</span>${gno}. ${esc(g.label)}
         <span class="gcnt">${items.length}</span>
       </button>
-      ${open? `<div class="sb-items">${items.map(([k,ic,l])=>`
+      ${open? `<div class="sb-items">${items.map(([k,l],i)=>`
         <button class="sb-item ${view===k?'active':''}" onclick="go('${k}')">
-          <span class="ic">${ic}</span>${esc(l)}</button>`).join('')}</div>`:''}
+          <span class="ic">${CIRC[i]||''}</span>${esc(l)}</button>`).join('')}</div>`:''}
     </div>`;
   }).join('');
 
@@ -1572,28 +1575,28 @@ function renderNav(){
     <div class="sb-user">
       <span class="dot"></span><b title="${esc(myEmail())}">${esc(uname)}（${esc(myRole())}）</b><span class="st">アクティブ</span>
     </div>
-    <button class="sb-mypage" onclick="goMyPage()">📋 マイページ</button>
+    <button class="sb-mypage" onclick="goMyPage()">マイページ</button>
     ${myRank()>=1? `
     <div class="sb-alert" onclick="go('dashboard')">
-      <div class="row">🔔 <b>${alertTitle}</b><span class="cnt ${red?'':'z'}">${red+yel}</span></div>
-      <div class="sub-row"><span>🔴 要対応</span><span>${red}</span></div>
-      <div class="sub-row"><span>🟡 注意（90日以内など）</span><span>${yel}</span></div>
+      <div class="row"><b>${alertTitle}</b><span class="cnt ${red?'':'z'}">${red+yel}</span></div>
+      <div class="sub-row"><span><span style="color:#d64545">●</span> 要対応</span><span>${red}</span></div>
+      <div class="sub-row"><span><span style="color:#d9a400">●</span> 注意（90日以内など）</span><span>${yel}</span></div>
     </div>`:''}
     ${newVerAvailable? `
     <div class="sb-update" onclick="applyUpdate()" title="クリックで再読み込みします">
-      <b>🔄 新しいバージョンがあります</b>
+      <b>新しいバージョンがあります</b>
       <div>${esc(newVerAvailable)} ・ クリックで更新</div>
     </div>`:''}
     ${myRank()>=1? annCardHtml() : ''}
     <div class="sb-single">
       ${navAllowed('company')? `<button class="sb-item ${view==='company'?'active':''}" onclick="go('company')">
-        <span class="ic">🏢</span>企業情報</button>`:''}
+        企業情報</button>`:''}
       <button class="sb-item ${view==='dashboard'?'active':''}" onclick="go('dashboard')">
-        <span class="ic">🏠</span>ダッシュボード</button>
+        ダッシュボード</button>
     </div>
     ${groups}
     <div class="sb-foot">
-      <a href="javascript:openPasswordChange()">🔑 パスワード変更</a>
+      <a href="javascript:openPasswordChange()">パスワード変更</a>
       <span class="sep">|</span>
       <a href="javascript:logout()">ログアウト</a>
     </div>`;
@@ -2382,7 +2385,7 @@ function viewTalent(){
   }).join('');
   return `
   <div class="panel">
-    <h2>タレント <span class="en">Profile Book — 顔ぶれから探す人材データベース</span></h2>
+    <h2>社員情報 <span class="en">Profile Book — 顔ぶれから探す人材データベース</span></h2>
     <div class="toolbar">
       <input placeholder="名前・社員番号で検索" value="${esc(f.q)}"
         oninput="talentFilter.q=this.value;render()" style="min-width:170px">
